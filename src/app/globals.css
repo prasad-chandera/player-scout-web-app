@@ -1,26 +1,41 @@
 @import "tailwindcss";
 
+/* Dark scouting-dashboard theme (single committed look).
+   Chart chrome + series colors follow the validated dark-mode palette. */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  color-scheme: dark;
+  --background: #0d0d0d;      /* page plane */
+  --surface: #1a1a19;         /* card / chart surface */
+  --foreground: #ffffff;      /* primary ink */
+  --ink-secondary: #c3c2b7;
+  --ink-muted: #898781;
+  --grid: #2c2c2a;
+  --baseline: #383835;
+  --border: rgba(255, 255, 255, 0.1);
+  --series-1: #3987e5;        /* blue — the single data hue */
+  --series-1-soft: rgba(57, 135, 229, 0.28);
+  --good: #0ca30c;
+  --warning: #fab219;
 }
 
 @theme inline {
   --color-background: var(--background);
+  --color-surface: var(--surface);
   --color-foreground: var(--foreground);
+  --color-ink-secondary: var(--ink-secondary);
+  --color-ink-muted: var(--ink-muted);
+  --color-grid: var(--grid);
+  --color-baseline: var(--baseline);
+  --color-hairline: var(--border);
+  --color-series: var(--series-1);
+  --color-good: var(--good);
+  --color-warn: var(--warning);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-geist-sans), system-ui, -apple-system, "Segoe UI", sans-serif;
 }

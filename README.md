@@ -1,36 +1,51 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# ScoutIQ — Moneyball for the IPL
 
-## Getting Started
+AI scouting assistant that finds **undervalued domestic cricketers** and explains
+*why* — similarity search, transparent IPL-readiness scoring, and Claude-generated
+scouting reports grounded in computed stats.
 
-First, run the development server:
+This repo is the **frontend** (Next.js App Router + TypeScript + Tailwind CSS +
+Recharts). The analytics backend is a separate Node.js project whose full API
+contract is documented here.
+
+## Documentation
+
+| File | Contents |
+|---|---|
+| [docs/01-overview.md](docs/01-overview.md) | Vision, scope, architecture, demo script |
+| [docs/02-sections-detailed.md](docs/02-sections-detailed.md) | Every pipeline stage in detail: features (with formulas), similarity, readiness score, LLM layer, page specs |
+| [docs/03-api-endpoints-and-ai.md](docs/03-api-endpoints-and-ai.md) | **Backend API contract** — all 11 endpoints with example JSON, plus AI requirements (cosine similarity, scoring, Claude prompts) |
+| [docs/04-data-sources.md](docs/04-data-sources.md) | Where the data comes from (Cricsheet, Kaggle) and the ingestion pipeline |
+
+## Getting started
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open http://localhost:3000. The app ships with **mock data** so every page works
+with no backend:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+| Route | Page |
+|---|---|
+| `/` | Search ("find the next Bumrah") + readiness rankings |
+| `/players/[id]` | Player detail: radar chart, phase stats, comparison table, AI scout report |
+| `/undervalued` | Top-10 undervalued players + price-vs-readiness scatter |
+| `/team-fit` | Best players for a chosen franchise's needs |
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Connecting the real backend
 
-## Learn More
+1. Build the Node.js backend against [docs/03-api-endpoints-and-ai.md](docs/03-api-endpoints-and-ai.md).
+2. `cp .env.local.example .env.local`, set `NEXT_PUBLIC_API_URL`, and set `NEXT_PUBLIC_USE_MOCK=false`.
+3. No component changes needed — `src/lib/api.ts` switches from mock to fetch.
 
-To learn more about Next.js, take a look at the following resources:
+Key source files: [src/lib/types.ts](src/lib/types.ts) (shared API shapes),
+[src/lib/api.ts](src/lib/api.ts) (typed client + mock switch),
+[src/lib/mock/players.ts](src/lib/mock/players.ts) (fictional demo data).
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Data & attribution
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Ball-by-ball data for the real pipeline comes from [Cricsheet](https://cricsheet.org)
+(ODC-By license). All bundled mock stats are fictional, including those attached to
+real player names.
