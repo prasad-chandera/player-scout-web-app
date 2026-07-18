@@ -46,7 +46,7 @@ export function ThemeToggle() {
       onClick={toggle}
       aria-label={mounted ? `Switch to ${isDark ? "light" : "dark"} theme` : "Toggle theme"}
       title={mounted ? `Switch to ${isDark ? "light" : "dark"} theme` : "Toggle theme"}
-      className="ml-auto flex size-9 items-center justify-center rounded-lg border border-hairline text-ink-secondary transition-colors hover:bg-surface hover:text-foreground"
+      className="flex size-9 items-center justify-center rounded-lg border border-hairline text-ink-secondary transition-colors hover:bg-surface hover:text-foreground"
     >
       {/* Render an icon only after mount to avoid a hydration mismatch. */}
       {mounted && (isDark ? <SunIcon /> : <MoonIcon />)}
