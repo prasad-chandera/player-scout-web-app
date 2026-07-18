@@ -1,4 +1,4 @@
-# ScoutIQ — Detailed Section-by-Section Design
+# Player Scout — Detailed Section-by-Section Design
 
 Each section below covers one stage of the pipeline: what it does, its inputs and outputs, how to build it within hackathon time, and the pitfalls to avoid.
 

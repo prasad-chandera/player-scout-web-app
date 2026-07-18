@@ -18,22 +18,21 @@ const LABELS: Record<keyof SkillGroups, string> = {
   consistency: "Consistency",
 };
 
-/** Single-series skill radar; the card title carries identity (no legend needed). */
-export default function RadarChartCard({
-  name,
-  skillGroups,
-}: {
+export interface RadarChartCardProps {
   name: string;
   skillGroups: SkillGroups;
-}) {
+}
+
+/** Single-series skill radar; the card title carries identity (no legend needed). */
+export function RadarChartCard({ name, skillGroups }: RadarChartCardProps) {
   const data = (Object.keys(LABELS) as (keyof SkillGroups)[]).map((k) => ({
     skill: LABELS[k],
     value: Math.round(skillGroups[k] * 100),
   }));
 
   return (
-    <div className="rounded-xl border border-hairline bg-surface p-4">
-      <h3 className="text-sm font-semibold text-ink-secondary">Skill profile — {name}</h3>
+    <div className="card rounded-2xl p-4">
+      <h3 className="font-display text-sm font-semibold uppercase tracking-wide text-ink-secondary">Skill profile — {name}</h3>
       <div className="h-64">
         <ResponsiveContainer width="100%" height="100%">
           <RadarChart data={data} outerRadius="75%">

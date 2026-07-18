@@ -1,26 +1,109 @@
 @import "tailwindcss";
 
-/* Dark scouting-dashboard theme (single committed look).
-   Chart chrome + series colors follow the validated dark-mode palette. */
+/* =====================================================================
+   Player Scout design system — "Pitch & Gold" broadcast theme.
+   See docs/05-design-system.md.
+
+   Tier 1: BRAND KNOB — change --brand to re-theme the whole app.
+   Tier 2: SEMANTIC TOKENS — what components use, one set per theme.
+   Theming: default follows the OS (prefers-color-scheme); the header
+   toggle stamps data-theme="light|dark" on <html>, which wins over the OS.
+   ===================================================================== */
+
+/* ---- Tier 1: brand knob (primary colors live here) ---- */
 :root {
-  color-scheme: dark;
-  --background: #0d0d0d;      /* page plane */
-  --surface: #1a1a19;         /* card / chart surface */
-  --foreground: #ffffff;      /* primary ink */
-  --ink-secondary: #c3c2b7;
-  --ink-muted: #898781;
-  --grid: #2c2c2a;
-  --baseline: #383835;
-  --border: rgba(255, 255, 255, 0.1);
-  --series-1: #3987e5;        /* blue — the single data hue */
-  --series-1-soft: rgba(57, 135, 229, 0.28);
-  --good: #0ca30c;
-  --warning: #fab219;
+  --brand: #0f7a44;          /* PRIMARY — field green. Change this to re-theme */
+  --brand-strong: #0b6236;   /* hover / active */
+  --brand-contrast: #ffffff; /* text/icon on a brand fill */
+  --accent: #b7841f;         /* auction gold */
+  --accent-contrast: #1a1200;
+  --ball: #c2362f;           /* seam red — value-gap, alerts, motifs */
 }
 
+/* ---- Tier 2: semantic tokens — LIGHT (default), parchment + pitch ---- */
+:root {
+  color-scheme: light;
+  --background: #f4efe2;     /* parchment page plane */
+  --surface: #fbf8f0;        /* card / chart surface */
+  --surface-raised: #ffffff; /* elevated cards */
+  --foreground: #15221a;     /* primary ink (green-black) */
+  --ink-secondary: #4a5a50;
+  --ink-muted: #8a8377;
+  --grid: #e4ddcb;           /* chart hairline grid */
+  --baseline: #cfc6b0;       /* chart axis / track */
+  --border: rgba(20, 30, 20, 0.1);
+  --series-1: var(--brand);
+  --series-2: var(--accent);
+  --series-1-soft: color-mix(in srgb, var(--brand) 14%, transparent);
+  --chart-cursor: rgba(20, 30, 20, 0.05);
+  --good: var(--brand);
+  --warning: #a85a12;        /* darker amber for contrast on parchment */
+
+  --shadow-1: 0 1px 2px rgba(20, 30, 20, 0.06), 0 4px 12px rgba(20, 30, 20, 0.06);
+  --shadow-2: 0 2px 6px rgba(20, 30, 20, 0.1), 0 16px 40px rgba(20, 30, 20, 0.12);
+  --glow-brand: 0 0 0 3px color-mix(in srgb, var(--brand) 22%, transparent);
+  --grad-brand: linear-gradient(135deg, var(--brand), #14a45a);
+  --grad-gold: linear-gradient(135deg, var(--accent), #e7b23c);
+  --aura-1: color-mix(in srgb, var(--brand) 22%, transparent);
+  --aura-2: color-mix(in srgb, var(--accent) 20%, transparent);
+}
+
+/* ---- Tier 2: semantic tokens — DARK (night pitch) ---- */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --brand: #28b265;
+    --brand-strong: #1f9a54;
+    --accent: #e7b23c;
+    --ball: #e24b41;
+    --background: #0b1710;
+    --surface: #10201a;
+    --surface-raised: #16281f;
+    --foreground: #eaf3ec;
+    --ink-secondary: #a9bdb0;
+    --ink-muted: #7c8a80;
+    --grid: #1e3228;
+    --baseline: #2a3e33;
+    --border: rgba(255, 255, 255, 0.09);
+    --chart-cursor: rgba(255, 255, 255, 0.06);
+    --warning: #e7b23c;
+    --shadow-1: 0 1px 2px rgba(0, 0, 0, 0.4), 0 6px 16px rgba(0, 0, 0, 0.4);
+    --shadow-2: 0 4px 10px rgba(0, 0, 0, 0.5), 0 20px 48px rgba(0, 0, 0, 0.55);
+  }
+}
+
+/* explicit toggle → dark (wins over OS light) */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --brand: #28b265;
+  --brand-strong: #1f9a54;
+  --accent: #e7b23c;
+  --ball: #e24b41;
+  --background: #0b1710;
+  --surface: #10201a;
+  --surface-raised: #16281f;
+  --foreground: #eaf3ec;
+  --ink-secondary: #a9bdb0;
+  --ink-muted: #7c8a80;
+  --grid: #1e3228;
+  --baseline: #2a3e33;
+  --border: rgba(255, 255, 255, 0.09);
+  --chart-cursor: rgba(255, 255, 255, 0.06);
+  --warning: #e7b23c;
+  --shadow-1: 0 1px 2px rgba(0, 0, 0, 0.4), 0 6px 16px rgba(0, 0, 0, 0.4);
+  --shadow-2: 0 4px 10px rgba(0, 0, 0, 0.5), 0 20px 48px rgba(0, 0, 0, 0.55);
+}
+
+/* explicit toggle → light (light values already on :root; reset color-scheme) */
+:root[data-theme="light"] {
+  color-scheme: light;
+}
+
+/* ---- Tailwind v4: expose semantic tokens as utilities ---- */
 @theme inline {
   --color-background: var(--background);
   --color-surface: var(--surface);
+  --color-surface-raised: var(--surface-raised);
   --color-foreground: var(--foreground);
   --color-ink-secondary: var(--ink-secondary);
   --color-ink-muted: var(--ink-muted);
@@ -28,14 +111,110 @@
   --color-baseline: var(--baseline);
   --color-hairline: var(--border);
   --color-series: var(--series-1);
+  --color-series-2: var(--series-2);
+  --color-accent: var(--accent);
+  --color-accent-contrast: var(--accent-contrast);
+  --color-ball: var(--ball);
+  --color-on-primary: var(--brand-contrast);
+  --color-brand-strong: var(--brand-strong);
   --color-good: var(--good);
   --color-warn: var(--warning);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --font-display: var(--font-display);
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-geist-sans), system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+/* =====================================================================
+   Motif & effect utilities (the cricket-broadcast character)
+   ===================================================================== */
+
+/* elevated card with hover lift */
+.card {
+  background: var(--surface-raised);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-1);
+  transition: box-shadow 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
+}
+.card-hover:hover {
+  box-shadow: var(--shadow-2);
+  transform: translateY(-2px);
+  border-color: color-mix(in srgb, var(--brand) 40%, var(--border));
+}
+
+/* cricket-ball seam: a stitched divider */
+.seam {
+  height: 2px;
+  background-image: repeating-linear-gradient(
+    90deg,
+    var(--accent) 0 10px,
+    transparent 10px 18px
+  );
+  opacity: 0.75;
+}
+
+/* 22-yard pitch line under headings */
+.pitch-line {
+  height: 3px;
+  width: 44px;
+  border-radius: 999px;
+  background: var(--grad-gold);
+}
+
+/* ambient broadcast glow behind hero sections */
+.hero-aura {
+  position: relative;
+  isolation: isolate;
+}
+.hero-aura::before {
+  content: "";
+  position: absolute;
+  inset: -20% -10% auto -10%;
+  height: 340px;
+  z-index: -1;
+  background:
+    radial-gradient(60% 60% at 20% 20%, var(--aura-1), transparent 70%),
+    radial-gradient(50% 50% at 85% 10%, var(--aura-2), transparent 70%);
+  filter: blur(10px);
+  pointer-events: none;
+}
+
+/* subtle grain to kill the flat "AI" look */
+.grain::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.035;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* gradient text for hero headlines */
+.text-gradient {
+  background: linear-gradient(120deg, var(--foreground), var(--brand) 60%, var(--accent));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+@keyframes rise-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.rise-in { animation: rise-in 0.5s ease both; }
+
+@keyframes glow-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--brand) 30%, transparent); }
+  50% { box-shadow: 0 0 0 8px transparent; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rise-in { animation: none; }
+  .card, .card-hover:hover { transition: none; transform: none; }
 }

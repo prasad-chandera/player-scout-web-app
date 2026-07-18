@@ -1,13 +1,23 @@
 import type { Explanation } from "@/lib/types";
 
+export interface AISummaryCardProps {
+  explanation: Explanation;
+}
+
 /** Claude's grounded scouting report, rendered as cards (never a text blob). */
-export default function AISummaryCard({ explanation }: { explanation: Explanation }) {
+export function AISummaryCard({ explanation }: AISummaryCardProps) {
   return (
-    <div className="rounded-xl border border-hairline bg-surface p-5">
+    <div className="card overflow-hidden rounded-2xl p-5">
       <div className="flex items-center gap-2">
-        <span className="rounded-full bg-series/20 px-2 py-0.5 text-[11px] font-semibold text-series">AI SCOUT REPORT</span>
+        <span
+          className="rounded-full px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wide text-on-primary"
+          style={{ background: "var(--grad-brand)" }}
+        >
+          AI Scout Report
+        </span>
         <span className="text-[11px] text-ink-muted">generated from computed stats only</span>
       </div>
+      <div className="seam mt-3" />
       <p className="mt-3 leading-relaxed text-ink-secondary">{explanation.summary}</p>
 
       <div className="mt-4 grid gap-4 sm:grid-cols-2">

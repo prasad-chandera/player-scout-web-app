@@ -12,11 +12,15 @@ import {
 } from "recharts";
 import type { UndervaluedEntry } from "@/lib/types";
 
+export interface ValueScatterProps {
+  entries: UndervaluedEntry[];
+}
+
 /**
  * Expected auction price (x) vs IPL readiness (y). The undervalued cluster is
  * top-left: high readiness, low price. Single series; names are direct labels.
  */
-export default function ValueScatter({ entries }: { entries: UndervaluedEntry[] }) {
+export function ValueScatter({ entries }: ValueScatterProps) {
   const data = entries.map((e) => ({
     name: e.player.name,
     price: e.expectedPriceLakh,
@@ -24,8 +28,8 @@ export default function ValueScatter({ entries }: { entries: UndervaluedEntry[] 
   }));
 
   return (
-    <div className="rounded-xl border border-hairline bg-surface p-4">
-      <h3 className="text-sm font-semibold text-ink-secondary">
+    <div>
+      <h3 className="font-display text-sm font-semibold uppercase tracking-wide text-ink-secondary">
         Readiness vs expected price — top-left is the value zone
       </h3>
       <div className="h-72">
@@ -56,13 +60,14 @@ export default function ValueScatter({ entries }: { entries: UndervaluedEntry[] 
               cursor={{ strokeDasharray: "4 4", stroke: "var(--baseline)" }}
               formatter={(value, name) => (name === "Expected price" ? [`₹${value}L`, name] : [value, name])}
               contentStyle={{
-                background: "var(--surface)",
+                background: "var(--surface-raised)",
                 border: "1px solid var(--border)",
-                borderRadius: 8,
+                borderRadius: 10,
                 color: "var(--foreground)",
+                boxShadow: "var(--shadow-1)",
               }}
             />
-            <Scatter data={data} fill="var(--series-1)" stroke="var(--surface)" strokeWidth={2} r={8}>
+            <Scatter data={data} fill="var(--series-1)" stroke="var(--surface-raised)" strokeWidth={2} r={9}>
               <LabelList dataKey="name" position="right" fill="var(--ink-secondary)" fontSize={11} />
             </Scatter>
           </ScatterChart>
