@@ -20,6 +20,7 @@ ScoutIQ ingests public ball-by-ball data, turns every player into a rich **featu
 
 | Scout's question | ScoutIQ capability |
 |---|---|
+| "Find me a left-arm death bowler under ₹50 lakh." | **Smart search** — Gemini parses the plain-English request into a structured query; the engine ranks. The LLM translates language, never ranks |
 | "Find me another Bumrah." | **Similarity search** — cosine similarity over player vectors, with a per-feature breakdown of *why* they're similar |
 | "Is this domestic player ready for the IPL?" | **IPL Readiness Score** — a transparent, weighted 0–100 score with visible per-feature contributions |
 | "Why should I trust this recommendation?" | **LLM explanation** — Claude turns the computed numbers into a grounded scouting report; it never invents stats |
@@ -83,7 +84,8 @@ flowchart TD
 | Database | PostgreSQL | Player profiles, precomputed scores, cached explanations |
 | Similarity | Cosine similarity in plain Node | ~500 players fits in memory; no vector DB needed |
 | Readiness model | Weighted feature scoring | Transparent > opaque for a hackathon demo |
-| LLM | Claude API (Anthropic) | Grounded explanations only; responses cached per player |
+| LLM (explain) | Claude API (Anthropic) | Grounded explanations only; responses cached per player |
+| LLM (search) | Gemini API (Google) | Parses free-text queries into structured filters; translator only, never ranks |
 | Data | Cricsheet (open ODC-By license) + Kaggle auction datasets | See doc 04 |
 
 ## 6. The Demo (3-minute judge walkthrough)

@@ -8,11 +8,10 @@ import {
   MOCK_PLAYERS,
   MOCK_TEAMS,
   NEED_FEATURES,
-  SEARCH_ALIASES,
   UNDERVALUED_DISCLAIMER,
   genericExplanation,
-  rawFeatureValue,
 } from "@/lib/mock/players";
+import { executeIntent, fallbackParse, similarTo, toSummary } from "@/lib/query";
 import type {
   Explanation,
   Player,
@@ -20,7 +19,7 @@ import type {
   ReadinessResponse,
   Role,
   SimilarSearchResponse,
-  SimilarityResult,
+  SmartSearchResponse,
   TeamFitResponse,
   TeamProfile,
   UndervaluedResponse,
@@ -45,48 +44,7 @@ async function post<T>(path: string, body: unknown): Promise<T> {
   return res.json();
 }
 
-// ---------- mock helpers (mirror the backend's AI-1 implementation) ----------
-
-function cosineSimilarity(a: number[], b: number[]): number {
-  let dot = 0, na = 0, nb = 0;
-  for (let i = 0; i < a.length; i++) {
-    dot += a[i] * b[i];
-    na += a[i] * a[i];
-    nb += b[i] * b[i];
-  }
-  return dot / (Math.sqrt(na) * Math.sqrt(nb));
-}
-
-function toSummary(p: Player): PlayerSummary {
-  const { id, name, role, readiness, expectedPriceLakh, tags } = p;
-  return { id, name, role, readiness, expectedPriceLakh, tags };
-}
-
-function similarTo(reference: Player, limit: number, excludeIpl: boolean): SimilarityResult[] {
-  const pool = MOCK_PLAYERS.filter(
-    (p) =>
-      p.id !== reference.id &&
-      (p.role === reference.role || p.role === "allrounder" || reference.role === "allrounder") &&
-      (!excludeIpl || p.competition !== "ipl"),
-  );
-  return pool
-    .map((p) => {
-      const similarity = cosineSimilarity(reference.featureVector, p.featureVector);
-      const dot = reference.featureVector.reduce((s, v, i) => s + v * p.featureVector[i], 0);
-      const topContributions = FEATURES.map((f, i) => ({
-        feature: f.key,
-        label: f.label,
-        contribution: (reference.featureVector[i] * p.featureVector[i]) / dot,
-        referenceValue: rawFeatureValue(reference, f.key),
-        candidateValue: rawFeatureValue(p, f.key),
-      }))
-        .sort((x, y) => y.contribution - x.contribution)
-        .slice(0, 3);
-      return { player: toSummary(p), similarity, topContributions };
-    })
-    .sort((a, b) => b.similarity - a.similarity)
-    .slice(0, limit);
-}
+// Similarity + intent helpers now live in @/lib/query (shared, network-free).
 
 // ------------------------------- public API ---------------------------------
 
@@ -135,30 +93,17 @@ export async function getSimilar(
   );
 }
 
-/** "Find the next Bumrah" — resolves free text to a reference player. */
-export async function searchSimilar(query: {
-  description?: string;
-  referencePlayerId?: string;
-  limit?: number;
-  excludeIpl?: boolean;
-}): Promise<SimilarSearchResponse | { error: string }> {
+/**
+ * Smart natural-language search (POST /api/search). In production the backend's
+ * Gemini parses the text into a SearchIntent, then its engine ranks (docs/03 §AI-5).
+ * In mock mode we do the same deterministically: a keyword parser + local engine,
+ * no network and no LLM key — so the demo runs standalone.
+ */
+export async function smartSearch(query: string, limit = 8): Promise<SmartSearchResponse> {
   if (USE_MOCK) {
-    let refId = query.referencePlayerId;
-    if (!refId && query.description) {
-      const text = query.description.toLowerCase();
-      for (const [alias, id] of Object.entries(SEARCH_ALIASES)) {
-        if (text.includes(alias)) refId = id;
-      }
-      if (!refId) {
-        const byName = MOCK_PLAYERS.find((p) => text.includes(p.name.toLowerCase()));
-        refId = byName?.id;
-      }
-    }
-    if (!refId) return { error: "Couldn't identify a reference player in the query. Try e.g. \"find the next Bumrah\"." };
-    const result = await getSimilar(refId, { limit: query.limit ?? 10, excludeIpl: query.excludeIpl ?? true });
-    return result ?? { error: "Reference player not found." };
+    return executeIntent(fallbackParse(query), limit);
   }
-  return post<SimilarSearchResponse>("/api/search/similar", query);
+  return post<SmartSearchResponse>("/api/search", { query, limit });
 }
 
 export async function getReadiness(id: string): Promise<ReadinessResponse | undefined> {

@@ -17,7 +17,8 @@ Conventions:
 | 1 | GET | `/api/players` | List/search players with filters |
 | 2 | GET | `/api/players/:id` | Full player profile |
 | 3 | GET | `/api/players/:id/similar` | Top-N similar players |
-| 4 | POST | `/api/search/similar` | "Find the next Bumrah" search |
+| 4 | POST | `/api/search/similar` | "Find the next Bumrah" search (direct, by reference id) |
+| 4b | POST | `/api/search` | **Smart natural-language search** (Gemini-parsed) |
 | 5 | GET | `/api/players/:id/readiness` | Readiness score with breakdown |
 | 6 | POST | `/api/explain/player` | Claude scouting report for a player |
 | 7 | POST | `/api/explain/comparison` | Claude side-by-side comparison |
@@ -147,9 +148,53 @@ The search bar endpoint. Accepts either a reference player or a free-text descri
 { "description": "find the next bumrah", "limit": 10, "excludeIpl": true }
 ```
 
-**Description resolution (keep it simple):** lowercase the text, match known player names/aliases against a lookup (`"bumrah" → bumrah01`); optionally match role keywords ("death bowler" → filter role=bowler, sort by death features). If nothing matches: `400 UNRESOLVED_QUERY` with `"message": "Couldn't identify a reference player in the query"` — the frontend then shows name suggestions. **Do not use the LLM to parse queries in v1**; a lookup table covers the demo and never fails on stage.
+**Description resolution:** lowercase the text, match known player names/aliases against a lookup (`"bumrah" → bumrah01`). This endpoint is the **direct, id-based** path used when the caller already knows the reference player. Free-text scout queries go to **endpoint 4b** (`POST /api/search`), which uses Gemini for real language understanding. This endpoint remains the deterministic fallback the parser calls once it has resolved a reference id.
 
 **Response:** identical shape to endpoint 3.
+
+---
+
+## 4b. `POST /api/search` — Smart natural-language search
+
+The primary search-bar endpoint. Takes a raw scout sentence, uses **Gemini to parse it into a structured `SearchIntent`** (see §AI-5), then runs the **deterministic** engine (filter + cosine/feature-sort) to produce ranked results. The LLM never ranks or invents numbers — it only translates language into filters.
+
+**Body:**
+
+```json
+{ "query": "a left-arm death bowler under ₹50 lakh strong against right-handers", "limit": 8 }
+```
+
+**Response (`SmartSearchResponse`):**
+
+```json
+{
+  "intent": {
+    "referencePlayerName": null,
+    "role": "bowler",
+    "bowlingStyleContains": "left-arm",
+    "battingHand": null,
+    "maxPriceLakh": 50,
+    "minReadiness": null,
+    "sortBy": "deathImpact",
+    "strongVs": "RHB",
+    "keywords": ["death"]
+  },
+  "interpretation": "left-arm bowlers · strong vs RHB · best at death-overs impact · ≤ ₹50L",
+  "mode": "filter",
+  "results": [
+    {
+      "player": { "id": "imran-shaikh", "name": "Imran Shaikh", "role": "bowler", "readiness": 84, "expectedPriceLakh": 40, "tags": ["..."] },
+      "matchReason": "Death-overs impact: econ 8.9 · readiness 84 · ₹40L"
+    }
+  ]
+}
+```
+
+- `mode` is `"similar"` when the query names a reference player (e.g. *"find the next Bumrah"*) — then each result also carries a `similarity` (0–1) and `reference` is set, and the shape matches endpoint 3's ranking. Otherwise `mode` is `"filter"`.
+- `interpretation` + `intent` power the **"Interpreted as" chips** in the UI — surfacing the AI's reasoning so the recommendation stays auditable.
+- **Fallback:** if `GEMINI_API_KEY` is unset or Gemini errors, parse with a keyword parser (roles, "left/right-arm", "under ₹Xl", "death/powerplay", "next <name>") and return the same shape. The frontend ships an identical keyword parser for mock mode (`src/lib/query.ts`), so the feature degrades gracefully and never hard-fails on stage.
+
+**Errors:** none fatal — an unparseable query returns an empty `results` array with a best-effort `intent`.
 
 ---
 
@@ -386,8 +431,38 @@ Include **percentile ranks** alongside raw values — they let Claude write "top
 - ~500 players × ~600 output tokens ≈ one-time cost of well under $2 with Sonnet; $0 during the demo because everything is cached.
 - **Demo rule:** pre-warm the cache for every player in the demo path; never depend on a live API call on stage. On `502 LLM_UNAVAILABLE`, the frontend falls back to rendering the readiness breakdown (endpoint 5), so the demo survives even a network failure.
 
+## AI-5. Gemini query parsing (smart search — endpoint 4b)
+
+The **only place a second LLM enters the system.** Gemini's job is narrow and safe: turn a scout's free-text query into a structured `SearchIntent`. It **never sees player stats, never ranks, never invents a number** — the deterministic engine (AI-1 + feature sort) does all the work once the intent exists. This is the same "AI translates, math decides" principle as the explanation layer, applied to the input side.
+
+- **SDK:** `@google/genai` (official Node SDK). Auth via `GEMINI_API_KEY` env var — server-side only, never in the frontend.
+- **Model:** `gemini-2.0-flash` (fast, cheap, has a free tier — ideal for a hackathon). Query parsing is a tiny task; no need for a larger model.
+- **Params:** `temperature: 0` (deterministic parsing), `responseMimeType: "application/json"` + a `responseSchema` so the reply is **guaranteed-valid JSON** matching the `SearchIntent` shape (no prose to regex out).
+- **Grounding via closed vocabulary:** build the schema's enums at request time from real data — valid `role`s, the bowling styles actually present in the dataset, the sortable feature keys from `GET /api/meta/features`, and known reference-player names. Gemini can only emit values that exist, so the intent always executes cleanly.
+
+**System prompt (draft):**
+
+```
+You convert a cricket scout's search request into a structured filter.
+Rules:
+1. Output ONLY the JSON schema fields. Do not add commentary.
+2. Choose values only from the allowed lists provided. If unsure, use null.
+3. "referencePlayerName" is set ONLY when the user names a specific player
+   ("next Bumrah", "like SKY"). Otherwise null.
+4. Map skill phrases to sortBy: death/last overs → deathImpact,
+   powerplay/new ball → powerplayImpact, economical/contain → containmentOrRotation,
+   pressure/chase → pressure, boundary/hitter → wicketOrBoundaryPct, etc.
+5. You are parsing intent only. You never rank players or output statistics.
+```
+
+**User message:** the raw query string + the allowed-value lists (roles, styles, feature keys, known names).
+
+**Fallback (critical for demos):** if `GEMINI_API_KEY` is missing or Gemini errors/times out, fall back to a keyword parser and return the same `SearchIntent` shape. The frontend already ships an identical parser (`src/lib/query.ts` → `fallbackParse` / `executeIntent`) for mock mode, so behaviour is consistent and the feature never hard-fails on stage.
+
+**Cost:** query parsing is ~100 output tokens per search; negligible. No caching needed (queries are unique), though you may cache identical query strings if desired.
+
 ## AI-4. Non-goals (v1)
 
-- No LLM query parsing (endpoint 4 uses a name/keyword lookup).
+- Gemini query parsing (AI-5) is a **translator only** — it never ranks players or produces stats. The deterministic keyword parser is its fallback, not a second ranker.
 - No embeddings model / vector database — cosine over engineered features is the whole engine, and that's a selling point (explainable dimensions).
 - No live model training in the backend; no video analysis.

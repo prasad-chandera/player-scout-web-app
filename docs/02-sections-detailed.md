@@ -119,6 +119,22 @@ Candidate  → [0.66,   0.93,      0.89,   0.80,   0.74,  0.85,  0.90,        0.
 
 **Pitfall:** cosine ignores magnitude, so a uniformly mediocre player can be "shaped like" Bumrah at a lower level. Mitigate by reporting similarity **alongside** the readiness score (Section 4), and show both in results.
 
+### 3.1 Smart natural-language search (Gemini — backend-owned)
+
+**What it does:** lets a scout type a plain sentence — *"a left-arm death bowler under ₹50 lakh strong against right-handers"* — instead of picking filters. **Gemini (in the backend)** converts the sentence into a structured `SearchIntent`; the deterministic engine below does the actual filtering and ranking.
+
+**Pipeline:**
+```
+free text → Gemini → SearchIntent (role, style, price cap, sortBy feature, "next <name>", …)
+          → executeIntent(): reference-player → cosine similarity (Section 3)
+                             otherwise        → filter + sort by the requested feature
+          → results + an "Interpreted as" chip row (shows the parsed intent)
+```
+
+**Why it's safe / on-thesis:** the LLM is a **translator, not a ranker** — it never sees a stat or invents a number; it only maps language onto a closed vocabulary of filters (valid roles, styles, feature keys, known names). Surfacing the parsed intent as chips keeps the whole thing auditable.
+
+**Two safety nets:** (1) if the Gemini key is absent or the call fails, a keyword parser produces the same `SearchIntent` shape, so search never hard-fails; (2) the frontend ships that same keyword parser (`src/lib/query.ts`) for mock mode, so the demo runs with no backend at all. Full spec: doc 03 endpoint 4b + §AI-5.
+
 ---
 
 ## Section 4 — IPL Readiness Score
