@@ -11,10 +11,13 @@ const ROLE_LABEL: Record<PlayerSummary["role"], string> = {
 export default function PlayerCard({
   player,
   similarity,
+  reason,
 }: {
   player: PlayerSummary;
   /** 0–1, shown when the card comes from a similarity search */
   similarity?: number;
+  /** why this player matched — shown instead of tags when present */
+  reason?: string;
 }) {
   return (
     <Link
@@ -29,13 +32,17 @@ export default function PlayerCard({
           <span className="truncate font-semibold">{player.name}</span>
           <span className="shrink-0 text-xs text-ink-muted">{ROLE_LABEL[player.role]}</span>
         </div>
-        <div className="mt-1 flex flex-wrap gap-1.5">
-          {player.tags.slice(0, 3).map((t) => (
-            <span key={t} className="rounded-full border border-hairline px-2 py-0.5 text-[11px] text-ink-secondary">
-              {t}
-            </span>
-          ))}
-        </div>
+        {reason ? (
+          <p className="mt-1 text-[12px] text-ink-secondary">{reason}</p>
+        ) : (
+          <div className="mt-1 flex flex-wrap gap-1.5">
+            {player.tags.slice(0, 3).map((t) => (
+              <span key={t} className="rounded-full border border-hairline px-2 py-0.5 text-[11px] text-ink-secondary">
+                {t}
+              </span>
+            ))}
+          </div>
+        )}
       </div>
       {similarity !== undefined && <SimilarityBadge value={Math.round(similarity * 100)} label="similar" size={56} />}
       <SimilarityBadge value={player.readiness} label="readiness" size={56} />

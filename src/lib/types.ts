@@ -67,6 +67,44 @@ export interface SimilarSearchResponse {
   results: SimilarityResult[];
 }
 
+// ---- Smart natural-language search (POST /api/search) ----
+// The LLM (Gemini, in the backend) only produces SearchIntent from free text;
+// deterministic code does all filtering/ranking. See docs/03 §AI-5.
+
+export type StrongVs = "RHB" | "LHB" | "spin" | "pace";
+
+export interface SearchIntent {
+  /** set when the query names a player, e.g. "next Bumrah" */
+  referencePlayerName?: string | null;
+  role?: Role | null;
+  /** substring match against Player.bowlingStyle, e.g. "left-arm" */
+  bowlingStyleContains?: string | null;
+  battingHand?: "left" | "right" | null;
+  maxPriceLakh?: number | null;
+  minReadiness?: number | null;
+  /** a FEATURES key to sort by, e.g. "deathImpact" */
+  sortBy?: string | null;
+  strongVs?: StrongVs | null;
+  keywords: string[];
+}
+
+export interface SmartSearchResult {
+  player: PlayerSummary;
+  /** present only in "similar" mode (0–1) */
+  similarity?: number;
+  /** human-readable reason this player matched the query */
+  matchReason: string;
+}
+
+export interface SmartSearchResponse {
+  intent: SearchIntent;
+  /** short human summary of the parsed intent, for the "Interpreted as" chips */
+  interpretation: string;
+  mode: "similar" | "filter";
+  reference?: { id: string; name: string };
+  results: SmartSearchResult[];
+}
+
 export interface ReadinessBreakdownRow {
   feature: string;
   label: string;

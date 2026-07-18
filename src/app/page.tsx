@@ -3,12 +3,12 @@
 import { useEffect, useState } from "react";
 import PlayerCard from "@/components/PlayerCard";
 import SearchBar from "@/components/SearchBar";
-import { listPlayers, searchSimilar } from "@/lib/api";
-import type { PlayerSummary, Role, SimilarSearchResponse } from "@/lib/types";
+import { listPlayers, smartSearch } from "@/lib/api";
+import type { PlayerSummary, Role, SmartSearchResponse } from "@/lib/types";
 
 export default function ScoutPage() {
   const [topPlayers, setTopPlayers] = useState<PlayerSummary[]>([]);
-  const [similar, setSimilar] = useState<SimilarSearchResponse | null>(null);
+  const [search, setSearch] = useState<SmartSearchResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
@@ -19,7 +19,7 @@ export default function ScoutPage() {
   async function handleSearch(query: string, role?: Role) {
     setError(null);
     if (!query) {
-      setSimilar(null);
+      setSearch(null);
       setBusy(true);
       try {
         setTopPlayers(await listPlayers({ role }));
@@ -30,12 +30,10 @@ export default function ScoutPage() {
     }
     setBusy(true);
     try {
-      const res = await searchSimilar({ description: query, excludeIpl: true, limit: 8 });
-      if ("error" in res) {
-        setSimilar(null);
-        setError(res.error);
-      } else {
-        setSimilar(res);
+      const res = await smartSearch(query);
+      setSearch(res);
+      if (res.results.length === 0) {
+        setError("No players matched that query. Try e.g. \"left-arm death bowler under ₹50 lakh\".");
       }
     } catch {
       setError("Search failed — is the backend running?");
@@ -51,8 +49,8 @@ export default function ScoutPage() {
           Find the next <span className="text-series">match-winner</span>
         </h1>
         <p className="mx-auto max-w-xl text-ink-secondary">
-          Search domestic players by skill profile. Every recommendation comes with
-          the numbers behind it — no black boxes.
+          Describe who you need in plain English. Every recommendation comes with the
+          numbers behind it — no black boxes.
         </p>
       </section>
 
@@ -62,14 +60,17 @@ export default function ScoutPage() {
         <p className="rounded-xl border border-hairline bg-surface px-4 py-3 text-sm text-warn">{error}</p>
       )}
 
-      {similar ? (
+      {search ? (
         <section className="space-y-3">
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-ink-muted">
-            Players most similar to {similar.reference.name}
-          </h2>
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="text-xs uppercase tracking-wide text-ink-muted">Interpreted as</span>
+            <span className="rounded-full border border-series bg-series/10 px-3 py-1 text-sm text-foreground">
+              {search.interpretation || "all players"}
+            </span>
+          </div>
           <div className="space-y-3">
-            {similar.results.map((r) => (
-              <PlayerCard key={r.player.id} player={r.player} similarity={r.similarity} />
+            {search.results.map((r) => (
+              <PlayerCard key={r.player.id} player={r.player} similarity={r.similarity} reason={r.matchReason} />
             ))}
           </div>
         </section>
