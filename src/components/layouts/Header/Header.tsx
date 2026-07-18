@@ -6,7 +6,8 @@ import { Logo } from "@/components/ui/Logo";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
 
 const NAV = [
-  { href: "/undervalued", label: "Undervalued" },
+  { href: "/", label: "Discover" },
+  { href: "/undervalued", label: "Hidden Gems" },
   { href: "/team-fit", label: "Team Fit" },
 ];
 

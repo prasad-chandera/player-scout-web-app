@@ -130,6 +130,21 @@ body {
   font-family: var(--font-geist-sans), system-ui, -apple-system, "Segoe UI", sans-serif;
 }
 
+/* ---- Interactive affordance ----
+   Action items always show a pointer cursor (Tailwind v4 Preflight resets
+   <button> to the default cursor; disabled controls show not-allowed). */
+button:not(:disabled),
+[role="button"]:not(:disabled),
+a[href],
+label[for],
+summary {
+  cursor: pointer;
+}
+button:disabled,
+[aria-disabled="true"] {
+  cursor: not-allowed;
+}
+
 /* =====================================================================
    Motif & effect utilities (the cricket-broadcast character)
    ===================================================================== */

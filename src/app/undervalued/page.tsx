@@ -28,7 +28,7 @@ export default function UndervaluedPage() {
           <span className="size-1.5 rounded-full bg-accent" /> The Moneyball list
         </span>
         <h1 className="font-display text-4xl font-bold uppercase tracking-tight sm:text-5xl">
-          Undervalued <span className="text-gradient">talent</span>
+          Hidden <span className="text-gradient">gems</span>
         </h1>
         <p className="max-w-2xl text-sm text-ink-secondary">
           Players whose skill profile is worth far more than their expected auction price.
