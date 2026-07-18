@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Oswald } from "next/font/google";
 import Link from "next/link";
+import Logo from "@/components/Logo";
 import ThemeToggle from "@/components/ThemeToggle";
 import "./globals.css";
 
@@ -19,8 +20,15 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+// Condensed sporty display face for headings + big stat numbers.
+const oswald = Oswald({
+  variable: "--font-display",
+  subsets: ["latin"],
+  weight: ["500", "600", "700"],
+});
+
 export const metadata: Metadata = {
-  title: "ScoutIQ — Moneyball for the IPL",
+  title: "Player Scout — Moneyball for the IPL",
   description:
     "AI scouting assistant that finds undervalued domestic cricketers and explains why.",
 };
@@ -39,18 +47,22 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      suppressHydrationWarning
+      className={`${geistSans.variable} ${geistMono.variable} ${oswald.variable} h-full antialiased`}
     >
       <head>
         <script dangerouslySetInnerHTML={{ __html: THEME_INIT }} />
       </head>
-      <body className="flex min-h-full flex-col">
-        <header className="sticky top-0 z-10 border-b border-hairline bg-background/90 backdrop-blur">
-          <div className="mx-auto flex max-w-5xl items-center gap-4 px-4 py-3">
-            <Link href="/" className="flex items-baseline gap-1 text-lg font-bold">
-              Scout<span className="text-series">IQ</span>
+      <body className="grain relative flex min-h-full flex-col">
+        <header className="sticky top-0 z-20 border-b border-hairline bg-background/80 backdrop-blur-md">
+          <div className="mx-auto flex max-w-6xl items-center gap-5 px-4 py-3">
+            <Link href="/" className="group flex items-center gap-2">
+              <Logo size={30} />
+              <span className="font-display text-xl font-bold uppercase tracking-wide">
+                Player <span className="text-series">Scout</span>
+              </span>
             </Link>
-            <nav className="flex gap-1 text-sm">
+            <nav className="flex gap-1 text-sm font-medium">
               {NAV.map((n) => (
                 <Link
                   key={n.href}
@@ -64,10 +76,11 @@ export default function RootLayout({
             <ThemeToggle />
           </div>
         </header>
-        <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-8">{children}</main>
-        <footer className="border-t border-hairline py-4 text-center text-xs text-ink-muted">
+        <main className="relative z-[1] mx-auto w-full max-w-6xl flex-1 px-4 py-10">{children}</main>
+        <footer className="relative z-[1] mt-4 border-t border-hairline py-6 text-center text-xs text-ink-muted">
+          <div className="seam mx-auto mb-4 max-w-6xl" />
           Hackathon demo · Ball-by-ball data ©{" "}
-          <a href="https://cricsheet.org" className="underline hover:text-ink-secondary">
+          <a href="https://cricsheet.org" className="text-ink-secondary underline hover:text-series">
             Cricsheet
           </a>{" "}
           (ODC-By) · Mock data shown until the backend is connected

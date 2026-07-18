@@ -1,4 +1,4 @@
-# ScoutIQ — Backend API Contract & AI Requirements
+# Player Scout — Backend API Contract & AI Requirements
 
 This document is the **complete contract** for the separate Node.js backend project. The frontend (`src/lib/api.ts` + `src/lib/types.ts` in this repo) is typed against these exact shapes — if a shape changes here, change it there too.
 

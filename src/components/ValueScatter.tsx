@@ -24,8 +24,8 @@ export default function ValueScatter({ entries }: { entries: UndervaluedEntry[] 
   }));
 
   return (
-    <div className="rounded-xl border border-hairline bg-surface p-4">
-      <h3 className="text-sm font-semibold text-ink-secondary">
+    <div>
+      <h3 className="font-display text-sm font-semibold uppercase tracking-wide text-ink-secondary">
         Readiness vs expected price — top-left is the value zone
       </h3>
       <div className="h-72">
@@ -56,13 +56,14 @@ export default function ValueScatter({ entries }: { entries: UndervaluedEntry[] 
               cursor={{ strokeDasharray: "4 4", stroke: "var(--baseline)" }}
               formatter={(value, name) => (name === "Expected price" ? [`₹${value}L`, name] : [value, name])}
               contentStyle={{
-                background: "var(--surface)",
+                background: "var(--surface-raised)",
                 border: "1px solid var(--border)",
-                borderRadius: 8,
+                borderRadius: 10,
                 color: "var(--foreground)",
+                boxShadow: "var(--shadow-1)",
               }}
             />
-            <Scatter data={data} fill="var(--series-1)" stroke="var(--surface)" strokeWidth={2} r={8}>
+            <Scatter data={data} fill="var(--series-1)" stroke="var(--surface-raised)" strokeWidth={2} r={9}>
               <LabelList dataKey="name" position="right" fill="var(--ink-secondary)" fontSize={11} />
             </Scatter>
           </ScatterChart>

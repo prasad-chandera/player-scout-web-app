@@ -32,8 +32,8 @@ export default function RadarChartCard({
   }));
 
   return (
-    <div className="rounded-xl border border-hairline bg-surface p-4">
-      <h3 className="text-sm font-semibold text-ink-secondary">Skill profile — {name}</h3>
+    <div className="card rounded-2xl p-4">
+      <h3 className="font-display text-sm font-semibold uppercase tracking-wide text-ink-secondary">Skill profile — {name}</h3>
       <div className="h-64">
         <ResponsiveContainer width="100%" height="100%">
           <RadarChart data={data} outerRadius="75%">

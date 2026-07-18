@@ -1,4 +1,4 @@
-# ScoutIQ — Project Overview
+# Player Scout — Project Overview
 
 > **Moneyball for the IPL.** An AI scouting assistant that discovers undervalued domestic cricketers and — crucially — *explains why* they are undervalued, instead of acting as a black-box ranker.
 
@@ -16,9 +16,9 @@ The result: genuine match-winners go for ₹20–40 lakh while comparable skills
 
 ## 2. The Idea
 
-ScoutIQ ingests public ball-by-ball data, turns every player into a rich **feature vector** (death-overs economy, strike rate vs spin, dot-ball % under pressure, …), and then answers three questions a scout actually asks:
+Player Scout ingests public ball-by-ball data, turns every player into a rich **feature vector** (death-overs economy, strike rate vs spin, dot-ball % under pressure, …), and then answers three questions a scout actually asks:
 
-| Scout's question | ScoutIQ capability |
+| Scout's question | Player Scout capability |
 |---|---|
 | "Find me a left-arm death bowler under ₹50 lakh." | **Smart search** — Gemini parses the plain-English request into a structured query; the engine ranks. The LLM translates language, never ranks |
 | "Find me another Bumrah." | **Similarity search** — cosine similarity over player vectors, with a per-feature breakdown of *why* they're similar |
@@ -66,7 +66,7 @@ flowchart TD
         F
         G
     end
-    subgraph Frontend["scout-iq (this repo)"]
+    subgraph Frontend["Player Scout (this repo)"]
         H
     end
 ```
@@ -100,7 +100,7 @@ flowchart TD
 
 ## 7. Why This Impresses Judges
 
-- **Explainability is the product.** Most AI demos are black boxes; ScoutIQ shows per-feature reasoning for every recommendation.
+- **Explainability is the product.** Most AI demos are black boxes; Player Scout shows per-feature reasoning for every recommendation.
 - **The LLM is used correctly** — as a narration layer over real analytics, not as the analytics. Judges who are skeptical of "GPT-wrapper" projects will notice this.
 - **A real economic story**: the undervalued-talent page mirrors Moneyball — finding value where the market isn't looking — and gives the demo an emotional hook.
 - **Honest data engineering**: all features derive from public ball-by-ball data with documented formulas (see doc 02), including honest notes on what *can't* be derived (e.g. true yorker %).

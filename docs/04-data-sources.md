@@ -1,4 +1,4 @@
-# ScoutIQ — Data Sources & Ingestion Pipeline
+# Player Scout — Data Sources & Ingestion Pipeline
 
 Everything the project needs is public and free. This doc lists each source, exactly what it feeds, and the step-by-step pipeline from download to `players.json` / Postgres seed.
 

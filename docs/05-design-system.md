@@ -1,8 +1,12 @@
-# ScoutIQ — Design System (Tokens & Theming)
+# Player Scout — Design System (Tokens & Theming)
 
-ScoutIQ uses a **design-token** system: components never hardcode colors — they reference
-semantic tokens, which resolve to different values per theme. This gives you light/dark
-switching and one-line brand re-coloring for free.
+Player Scout uses a **"Pitch & Gold"** cricket-broadcast theme built on a **design-token** system:
+components never hardcode colors — they reference semantic tokens, which resolve to different
+values per theme. This gives you light/dark switching and one-line brand re-coloring for free.
+
+**Identity:** field-green primary + auction-gold accent + seam-red highlight, on a warm
+parchment (light) / night-pitch (dark) surface. Headings use a condensed display face
+(**Oswald**, via `next/font`) for a sporty broadcast feel; body stays Geist.
 
 All tokens live in **[src/app/globals.css](../src/app/globals.css)**.
 
@@ -16,16 +20,20 @@ At the very top of `globals.css`:
 
 ```css
 :root {
-  --brand: #2a78d6;          /* PRIMARY — change this one line to re-theme */
-  --brand-strong: #1c5cab;   /* hover / active */
+  --brand: #0f7a44;          /* PRIMARY — field green. Change this to re-theme */
+  --brand-strong: #0b6236;   /* hover / active */
   --brand-contrast: #ffffff; /* text/icon on a brand fill */
+  --accent: #b7841f;         /* auction gold */
+  --accent-contrast: #1a1200;
+  --ball: #c2362f;           /* seam red — value-gap, alerts, motifs */
 }
 ```
 
 Change `--brand` and **every** button, link, active chip, similarity/readiness badge, and
-chart series updates — in both themes. Dark mode overrides `--brand` to a slightly lighter
-step (`#3987e5`) so it stays legible on the dark surface; change that line too if you want a
-different dark-mode primary.
+chart series updates — in both themes. Dark mode overrides `--brand` to a brighter step
+(`#28b265`) so it stays legible on the night-pitch surface; change that line too if you want a
+different dark-mode primary. `--accent` (gold) and `--ball` (red) are secondary knobs used for
+value emphasis, medallions, seam motifs, and the second chart series.
 
 > Want per-theme brand colors? Set `--brand` inside the light block and the dark blocks
 > separately. Otherwise the single top-level value applies everywhere.
@@ -37,25 +45,52 @@ Defined once per theme. These are the names components reference (via Tailwind u
 
 | Token | Tailwind utility | Role | Light | Dark |
 |---|---|---|---|---|
-| `--background` | `bg-background` | Page plane | `#f9f9f7` | `#0d0d0d` |
-| `--surface` | `bg-surface` | Cards / chart surface | `#fcfcfb` | `#1a1a19` |
-| `--foreground` | `text-foreground` | Primary ink | `#0b0b0b` | `#ffffff` |
-| `--ink-secondary` | `text-ink-secondary` | Secondary ink | `#52514e` | `#c3c2b7` |
-| `--ink-muted` | `text-ink-muted` | Labels / axes | `#898781` | `#898781` |
-| `--grid` | `stroke-grid`* | Chart gridlines | `#e1e0d9` | `#2c2c2a` |
-| `--baseline` | `stroke-baseline`* | Chart axis / track | `#c3c2b7` | `#383835` |
-| `--border` | `border-hairline` | Hairline borders | `rgba(11,11,11,.1)` | `rgba(255,255,255,.1)` |
-| `--series-1` | `bg-series` / `text-series` | Data / brand series (= `--brand`) | blue | blue |
-| `--good` | `text-good` | Positive / strengths | `#0ca30c` | `#0ca30c` |
-| `--warning` | `text-warn` | Caution / weaknesses | `#b26a00` | `#fab219` |
+| `--background` | `bg-background` | Page plane (parchment / night pitch) | `#f4efe2` | `#0b1710` |
+| `--surface` | `bg-surface` | Base surface / chips | `#fbf8f0` | `#10201a` |
+| `--surface-raised` | `bg-surface-raised` | Elevated cards (`.card`) | `#ffffff` | `#16281f` |
+| `--foreground` | `text-foreground` | Primary ink | `#15221a` | `#eaf3ec` |
+| `--ink-secondary` | `text-ink-secondary` | Secondary ink | `#4a5a50` | `#a9bdb0` |
+| `--ink-muted` | `text-ink-muted` | Labels / axes | `#8a8377` | `#7c8a80` |
+| `--grid` | via `var()` in charts | Chart gridlines | `#e4ddcb` | `#1e3228` |
+| `--baseline` | via `var()` in charts | Chart axis / track | `#cfc6b0` | `#2a3e33` |
+| `--border` | `border-hairline` | Hairline borders | `rgba(20,30,20,.1)` | `rgba(255,255,255,.09)` |
+| `--series-1` | `bg-series` / `text-series` | Primary data series (= `--brand`) | green | green |
+| `--series-2` | `text-series-2` | Second data series (= `--accent`) | gold | gold |
+| `--accent` | `text-accent` / `bg-accent` | Auction gold (value, medallions) | `#b7841f` | `#e7b23c` |
+| `--ball` | `text-ball` | Seam red (highlights, role stripe) | `#c2362f` | `#e24b41` |
+| `--good` | `text-good` | Positive / strengths (= brand) | green | green |
+| `--warning` | `text-warn` | Caution / weaknesses | `#a85a12` | `#e7b23c` |
 | `--brand-contrast` | `text-on-primary` | Text on a brand fill | `#ffffff` | `#ffffff` |
-| `--chart-cursor` | — (used via `var()` in charts) | Recharts hover cursor | `rgba(11,11,11,.05)` | `rgba(255,255,255,.05)` |
+| `--chart-cursor` | via `var()` in charts | Recharts hover cursor | `rgba(20,30,20,.05)` | `rgba(255,255,255,.06)` |
 
-\* Charts pass these as `var(--grid)` / `var(--baseline)` directly to Recharts props, not as
-Tailwind classes.
+Also available: elevation/effect tokens `--shadow-1`, `--shadow-2`, `--glow-brand`,
+gradients `--grad-brand` (green→teal) and `--grad-gold`, and hero-aura tints `--aura-1/2`.
 
-Palette values come from the validated dataviz reference palette, so both themes are
-contrast-checked out of the box.
+## Typography
+
+- **Display / headings & big numbers:** Oswald (condensed), loaded in
+  [layout.tsx](../src/app/layout.tsx) as `--font-display`; use via `font-display`. Pair with
+  `tabular-nums` for stats.
+- **Body:** Geist Sans (`font-sans`, the default).
+
+## Motif & effect utilities (in `globals.css`)
+
+The cricket-broadcast character comes from a handful of reusable utilities:
+
+| Class | What it does |
+|---|---|
+| `.card` / `.card-hover` | Elevated raised surface with shadow; `.card-hover` adds a lift + brand-tinted border on hover |
+| `.seam` | Cricket-ball **seam-stitch divider** (gold dashed) |
+| `.pitch-line` | The 22-yard gold rule under section headings (see `SectionHeading`) |
+| `.hero-aura` | Ambient radial green+gold glow behind hero sections |
+| `.grain` | Subtle noise overlay (on `<body>`) to avoid a flat look |
+| `.text-gradient` | Green→gold gradient text for hero headlines |
+| `.rise-in` | Gentle entrance animation (disabled under `prefers-reduced-motion`) |
+
+Shared building blocks: [Logo](../src/components/Logo.tsx) (seamed cricket-ball mark),
+[SectionHeading](../src/components/SectionHeading.tsx), [StatTile](../src/components/StatTile.tsx)
+(broadcast stat tile), and [SimilarityBadge](../src/components/SimilarityBadge.tsx) (green→gold
+gauge).
 
 ---
 

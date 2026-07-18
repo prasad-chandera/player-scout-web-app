@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import PlayerCard from "@/components/PlayerCard";
 import SearchBar from "@/components/SearchBar";
+import SectionHeading from "@/components/SectionHeading";
 import { listPlayers, smartSearch } from "@/lib/api";
 import type { PlayerSummary, Role, SmartSearchResponse } from "@/lib/types";
 
@@ -43,43 +44,50 @@ export default function ScoutPage() {
   }
 
   return (
-    <div className="space-y-8">
-      <section className="space-y-3 pt-4 text-center">
-        <h1 className="text-3xl font-bold sm:text-4xl">
-          Find the next <span className="text-series">match-winner</span>
+    <div className="space-y-10">
+      <section className="hero-aura rise-in space-y-5 pt-6 pb-2 text-center">
+        <span className="inline-flex items-center gap-2 rounded-full border border-hairline bg-surface px-3 py-1 text-[11px] font-semibold uppercase tracking-widest text-ink-secondary">
+          <span className="size-1.5 rounded-full bg-series" /> Moneyball for the IPL
+        </span>
+        <h1 className="font-display text-5xl font-bold uppercase leading-[0.95] tracking-tight sm:text-6xl">
+          Find the next
+          <br />
+          <span className="text-gradient">match-winner</span>
         </h1>
-        <p className="mx-auto max-w-xl text-ink-secondary">
-          Describe who you need in plain English. Every recommendation comes with the
-          numbers behind it — no black boxes.
+        <p className="mx-auto max-w-xl text-base text-ink-secondary">
+          Just tell us the kind of player you&apos;re looking for — in everyday words.
+          Every suggestion comes with the real stats behind it, so you can always see why.
         </p>
       </section>
 
-      <SearchBar onSearch={handleSearch} busy={busy} />
+      <div className="mx-auto max-w-3xl">
+        <SearchBar onSearch={handleSearch} busy={busy} />
+      </div>
 
       {error && (
         <p className="rounded-xl border border-hairline bg-surface px-4 py-3 text-sm text-warn">{error}</p>
       )}
 
       {search ? (
-        <section className="space-y-3">
+        <section className="space-y-4">
           <div className="flex flex-wrap items-center gap-2">
-            <span className="text-xs uppercase tracking-wide text-ink-muted">Interpreted as</span>
-            <span className="rounded-full border border-series bg-series/10 px-3 py-1 text-sm text-foreground">
+            <span className="text-[11px] font-semibold uppercase tracking-widest text-ink-muted">Interpreted as</span>
+            <span className="rounded-full border border-series bg-series/10 px-3 py-1 text-sm font-medium text-foreground">
               {search.interpretation || "all players"}
             </span>
           </div>
-          <div className="space-y-3">
+          <div className="grid gap-3">
             {search.results.map((r) => (
               <PlayerCard key={r.player.id} player={r.player} similarity={r.similarity} reason={r.matchReason} />
             ))}
           </div>
         </section>
       ) : (
-        <section className="space-y-3">
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-ink-muted">
+        <section className="space-y-4">
+          <SectionHeading sub="Domestic players ranked by our transparent readiness score.">
             Highest IPL readiness
-          </h2>
-          <div className="space-y-3">
+          </SectionHeading>
+          <div className="grid gap-3">
             {topPlayers.map((p) => (
               <PlayerCard key={p.id} player={p} />
             ))}

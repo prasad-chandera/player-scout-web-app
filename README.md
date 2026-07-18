@@ -1,4 +1,4 @@
-# ScoutIQ — Moneyball for the IPL
+# Player Scout — Moneyball for the IPL
 
 AI scouting assistant that finds **undervalued domestic cricketers** and explains
 *why* — similarity search, transparent IPL-readiness scoring, and Claude-generated

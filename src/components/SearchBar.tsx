@@ -28,32 +28,36 @@ export default function SearchBar({
         onSearch(text.trim(), role);
       }}
     >
-      <div className="flex gap-2">
-        <input
-          value={text}
-          onChange={(e) => setText(e.target.value)}
-          placeholder='Try "find the next Bumrah"…'
-          className="flex-1 rounded-xl border border-hairline bg-surface px-4 py-3 text-foreground placeholder:text-ink-muted focus:border-series focus:outline-none"
-          aria-label="Player search"
-        />
+      <div className="flex flex-col gap-2 sm:flex-row">
+        <div className="group relative flex-1">
+          <SearchIcon />
+          <input
+            value={text}
+            onChange={(e) => setText(e.target.value)}
+            placeholder='Try "a left-arm death bowler under ₹50 lakh"…'
+            className="w-full rounded-2xl border border-hairline bg-surface-raised py-4 pl-11 pr-4 text-foreground shadow-[var(--shadow-1)] transition-shadow placeholder:text-ink-muted focus:outline-none focus:[box-shadow:var(--glow-brand)]"
+            aria-label="Player search"
+          />
+        </div>
         <button
           type="submit"
           disabled={busy}
-          className="rounded-xl bg-series px-5 py-3 font-semibold text-on-primary transition-opacity hover:opacity-90 disabled:opacity-50"
+          className="rounded-2xl px-7 py-4 font-display text-lg font-semibold uppercase tracking-wide text-on-primary shadow-[var(--shadow-1)] transition-transform hover:-translate-y-0.5 disabled:opacity-50"
+          style={{ background: "var(--grad-brand)" }}
         >
-          {busy ? "Searching…" : "Scout"}
+          {busy ? "Scouting…" : "Scout"}
         </button>
       </div>
-      <div className="flex gap-2">
+      <div className="flex flex-wrap gap-2">
         {ROLES.map((r) => (
           <button
             key={r.label}
             type="button"
             onClick={() => setRole(r.value)}
-            className={`rounded-full border px-3 py-1 text-sm transition-colors ${
+            className={`rounded-full border px-3.5 py-1.5 text-sm font-medium transition-colors ${
               role === r.value
-                ? "border-series bg-series/20 text-foreground"
-                : "border-hairline text-ink-secondary hover:border-series"
+                ? "border-transparent bg-series text-on-primary"
+                : "border-hairline text-ink-secondary hover:border-series hover:text-foreground"
             }`}
           >
             {r.label}
@@ -61,5 +65,25 @@ export default function SearchBar({
         ))}
       </div>
     </form>
+  );
+}
+
+function SearchIcon() {
+  return (
+    <svg
+      className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-ink-muted"
+      width="18"
+      height="18"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden
+    >
+      <circle cx="11" cy="11" r="7" />
+      <path d="m21 21-4.3-4.3" />
+    </svg>
   );
 }
