@@ -37,7 +37,7 @@ export default function PhaseBarChart({ role, phaseStats }: { role: Role; phaseS
             <XAxis dataKey="phase" tick={{ fill: "var(--ink-muted)", fontSize: 12 }} stroke="var(--baseline)" tickLine={false} />
             <YAxis tick={{ fill: "var(--ink-muted)", fontSize: 12 }} stroke="var(--baseline)" tickLine={false} />
             <Tooltip
-              cursor={{ fill: "rgba(255,255,255,0.04)" }}
+              cursor={{ fill: "var(--chart-cursor)" }}
               formatter={(v) => [typeof v === "number" ? v.toFixed(1) : v, metric]}
               contentStyle={{
                 background: "var(--surface)",

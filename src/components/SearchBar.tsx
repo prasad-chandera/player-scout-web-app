@@ -39,7 +39,7 @@ export default function SearchBar({
         <button
           type="submit"
           disabled={busy}
-          className="rounded-xl bg-series px-5 py-3 font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-50"
+          className="rounded-xl bg-series px-5 py-3 font-semibold text-on-primary transition-opacity hover:opacity-90 disabled:opacity-50"
         >
           {busy ? "Searching…" : "Scout"}
         </button>

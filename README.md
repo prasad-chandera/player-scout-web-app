@@ -16,6 +16,7 @@ contract is documented here.
 | [docs/02-sections-detailed.md](docs/02-sections-detailed.md) | Every pipeline stage in detail: features (with formulas), similarity, readiness score, LLM layer, page specs |
 | [docs/03-api-endpoints-and-ai.md](docs/03-api-endpoints-and-ai.md) | **Backend API contract** — all 11 endpoints with example JSON, plus AI requirements (cosine similarity, scoring, Claude prompts) |
 | [docs/04-data-sources.md](docs/04-data-sources.md) | Where the data comes from (Cricsheet, Kaggle) and the ingestion pipeline |
+| [docs/05-design-system.md](docs/05-design-system.md) | Design tokens, light/dark theming, and how to change the primary color in one line |
 
 ## Getting started
 

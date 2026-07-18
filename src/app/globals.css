@@ -1,23 +1,85 @@
 @import "tailwindcss";
 
-/* Dark scouting-dashboard theme (single committed look).
-   Chart chrome + series colors follow the validated dark-mode palette. */
+/* =====================================================================
+   ScoutIQ design system — token layer.
+   See docs/05-design-system.md.
+
+   Tier 1: BRAND KNOB — change --brand to re-theme the whole app.
+   Tier 2: SEMANTIC TOKENS — what components use, one set per theme.
+   Theming: default follows the OS (prefers-color-scheme); the header
+   toggle stamps data-theme="light|dark" on <html>, which wins over the OS.
+   Palette values are from the validated dataviz reference palette.
+   ===================================================================== */
+
+/* ---- Tier 1: brand knob (primary color lives here) ---- */
 :root {
+  --brand: #2a78d6;          /* PRIMARY — change this one line to re-theme */
+  --brand-strong: #1c5cab;   /* hover / active */
+  --brand-contrast: #ffffff; /* text/icon sitting on a brand fill */
+}
+
+/* ---- Tier 2: semantic tokens — LIGHT (default) ---- */
+:root {
+  color-scheme: light;
+  --background: #f9f9f7;     /* page plane */
+  --surface: #fcfcfb;        /* card / chart surface */
+  --foreground: #0b0b0b;     /* primary ink */
+  --ink-secondary: #52514e;
+  --ink-muted: #898781;
+  --grid: #e1e0d9;           /* chart hairline grid */
+  --baseline: #c3c2b7;       /* chart axis / track */
+  --border: rgba(11, 11, 11, 0.1);
+  --series-1: var(--brand);
+  --series-1-soft: color-mix(in srgb, var(--brand) 14%, transparent);
+  --chart-cursor: rgba(11, 11, 11, 0.05);
+  --good: #0ca30c;
+  --warning: #b26a00;        /* darker for contrast on light surface */
+}
+
+/* ---- Tier 2: semantic tokens — DARK ---- */
+/* shared dark values, reused by both the OS-follow and explicit-toggle scopes */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --brand: #3987e5;        /* lighter validated step for the dark surface */
+    --background: #0d0d0d;
+    --surface: #1a1a19;
+    --foreground: #ffffff;
+    --ink-secondary: #c3c2b7;
+    --ink-muted: #898781;
+    --grid: #2c2c2a;
+    --baseline: #383835;
+    --border: rgba(255, 255, 255, 0.1);
+    --chart-cursor: rgba(255, 255, 255, 0.05);
+    --good: #0ca30c;
+    --warning: #fab219;
+  }
+}
+
+/* explicit toggle → dark (wins over OS light) */
+:root[data-theme="dark"] {
   color-scheme: dark;
-  --background: #0d0d0d;      /* page plane */
-  --surface: #1a1a19;         /* card / chart surface */
-  --foreground: #ffffff;      /* primary ink */
+  --brand: #3987e5;
+  --background: #0d0d0d;
+  --surface: #1a1a19;
+  --foreground: #ffffff;
   --ink-secondary: #c3c2b7;
   --ink-muted: #898781;
   --grid: #2c2c2a;
   --baseline: #383835;
   --border: rgba(255, 255, 255, 0.1);
-  --series-1: #3987e5;        /* blue — the single data hue */
-  --series-1-soft: rgba(57, 135, 229, 0.28);
+  --chart-cursor: rgba(255, 255, 255, 0.05);
   --good: #0ca30c;
   --warning: #fab219;
 }
 
+/* explicit toggle → light (wins over OS dark; light values already on :root,
+   this scope only needs to reset color-scheme for native controls) */
+:root[data-theme="light"] {
+  color-scheme: light;
+}
+
+/* ---- Tailwind v4: expose semantic tokens as utilities ---- */
 @theme inline {
   --color-background: var(--background);
   --color-surface: var(--surface);
@@ -28,6 +90,8 @@
   --color-baseline: var(--baseline);
   --color-hairline: var(--border);
   --color-series: var(--series-1);
+  --color-on-primary: var(--brand-contrast);
+  --color-brand-strong: var(--brand-strong);
   --color-good: var(--good);
   --color-warn: var(--warning);
   --font-sans: var(--font-geist-sans);
