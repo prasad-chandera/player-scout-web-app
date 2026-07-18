@@ -12,11 +12,15 @@ import {
 } from "recharts";
 import type { UndervaluedEntry } from "@/lib/types";
 
+export interface ValueScatterProps {
+  entries: UndervaluedEntry[];
+}
+
 /**
  * Expected auction price (x) vs IPL readiness (y). The undervalued cluster is
  * top-left: high readiness, low price. Single series; names are direct labels.
  */
-export default function ValueScatter({ entries }: { entries: UndervaluedEntry[] }) {
+export function ValueScatter({ entries }: ValueScatterProps) {
   const data = entries.map((e) => ({
     name: e.player.name,
     price: e.expectedPriceLakh,

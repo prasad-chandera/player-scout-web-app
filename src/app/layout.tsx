@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Oswald } from "next/font/google";
-import Link from "next/link";
-import Logo from "@/components/Logo";
-import ThemeToggle from "@/components/ThemeToggle";
+import { Footer } from "@/components/layouts/Footer";
+import { Header } from "@/components/layouts/Header";
 import "./globals.css";
 
 // Applied before first paint to prevent a flash of the wrong theme.
@@ -33,12 +32,6 @@ export const metadata: Metadata = {
     "AI scouting assistant that finds undervalued domestic cricketers and explains why.",
 };
 
-const NAV = [
-  { href: "/", label: "Scout" },
-  { href: "/undervalued", label: "Undervalued" },
-  { href: "/team-fit", label: "Team Fit" },
-];
-
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -54,37 +47,9 @@ export default function RootLayout({
         <script dangerouslySetInnerHTML={{ __html: THEME_INIT }} />
       </head>
       <body className="grain relative flex min-h-full flex-col">
-        <header className="sticky top-0 z-20 border-b border-hairline bg-background/80 backdrop-blur-md">
-          <div className="mx-auto flex max-w-6xl items-center gap-5 px-4 py-3">
-            <Link href="/" className="group flex items-center gap-2">
-              <Logo size={30} />
-              <span className="font-display text-xl font-bold uppercase tracking-wide">
-                Player <span className="text-series">Scout</span>
-              </span>
-            </Link>
-            <nav className="flex gap-1 text-sm font-medium">
-              {NAV.map((n) => (
-                <Link
-                  key={n.href}
-                  href={n.href}
-                  className="rounded-lg px-3 py-1.5 text-ink-secondary transition-colors hover:bg-surface hover:text-foreground"
-                >
-                  {n.label}
-                </Link>
-              ))}
-            </nav>
-            <ThemeToggle />
-          </div>
-        </header>
+        <Header />
         <main className="relative z-[1] mx-auto w-full max-w-6xl flex-1 px-4 py-10">{children}</main>
-        <footer className="relative z-[1] mt-4 border-t border-hairline py-6 text-center text-xs text-ink-muted">
-          <div className="seam mx-auto mb-4 max-w-6xl" />
-          Hackathon demo · Ball-by-ball data ©{" "}
-          <a href="https://cricsheet.org" className="text-ink-secondary underline hover:text-series">
-            Cricsheet
-          </a>{" "}
-          (ODC-By) · Mock data shown until the backend is connected
-        </footer>
+        <Footer />
       </body>
     </html>
   );

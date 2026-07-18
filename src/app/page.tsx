@@ -1,47 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import PlayerCard from "@/components/PlayerCard";
-import SearchBar from "@/components/SearchBar";
-import SectionHeading from "@/components/SectionHeading";
-import { listPlayers, smartSearch } from "@/lib/api";
-import type { PlayerSummary, Role, SmartSearchResponse } from "@/lib/types";
+import { ErrorState } from "@/components/feedback/ErrorState";
+import { PlayerCard } from "@/components/ui/PlayerCard";
+import { SectionHeading } from "@/components/ui/SectionHeading";
+import { SearchBar, useScout } from "@/features/scout";
 
 export default function ScoutPage() {
-  const [topPlayers, setTopPlayers] = useState<PlayerSummary[]>([]);
-  const [search, setSearch] = useState<SmartSearchResponse | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [busy, setBusy] = useState(false);
-
-  useEffect(() => {
-    listPlayers().then(setTopPlayers).catch(() => setError("Couldn't load players."));
-  }, []);
-
-  async function handleSearch(query: string, role?: Role) {
-    setError(null);
-    if (!query) {
-      setSearch(null);
-      setBusy(true);
-      try {
-        setTopPlayers(await listPlayers({ role }));
-      } finally {
-        setBusy(false);
-      }
-      return;
-    }
-    setBusy(true);
-    try {
-      const res = await smartSearch(query);
-      setSearch(res);
-      if (res.results.length === 0) {
-        setError("No players matched that query. Try e.g. \"left-arm death bowler under ₹50 lakh\".");
-      }
-    } catch {
-      setError("Search failed — is the backend running?");
-    } finally {
-      setBusy(false);
-    }
-  }
+  const { rankings, search, error, busy, runSearch } = useScout();
 
   return (
     <div className="space-y-10">
@@ -61,12 +26,10 @@ export default function ScoutPage() {
       </section>
 
       <div className="mx-auto max-w-3xl">
-        <SearchBar onSearch={handleSearch} busy={busy} />
+        <SearchBar onSearch={runSearch} busy={busy} />
       </div>
 
-      {error && (
-        <p className="rounded-xl border border-hairline bg-surface px-4 py-3 text-sm text-warn">{error}</p>
-      )}
+      {error && <ErrorState message={error} />}
 
       {search ? (
         <section className="space-y-4">
@@ -88,7 +51,7 @@ export default function ScoutPage() {
             Highest IPL readiness
           </SectionHeading>
           <div className="grid gap-3">
-            {topPlayers.map((p) => (
+            {rankings.map((p) => (
               <PlayerCard key={p.id} player={p} />
             ))}
           </div>

@@ -1,15 +1,13 @@
-/** Radial gauge — used for similarity %, readiness and fit scores.
- *  Broadcast styling: a green→gold gradient arc with a bold condensed numeral. */
-export default function SimilarityBadge({
-  value,
-  label,
-  size = 64,
-}: {
+export interface SimilarityBadgeProps {
   /** 0–100 */
   value: number;
   label?: string;
   size?: number;
-}) {
+}
+
+/** Radial gauge — used for similarity %, readiness and fit scores.
+ *  Broadcast styling: a green→gold gradient arc with a bold condensed numeral. */
+export function SimilarityBadge({ value, label, size = 64 }: SimilarityBadgeProps) {
   const v = Math.max(0, Math.min(100, value));
   const r = size / 2 - 5;
   const c = 2 * Math.PI * r;

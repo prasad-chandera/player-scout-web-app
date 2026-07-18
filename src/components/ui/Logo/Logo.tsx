@@ -1,5 +1,9 @@
+export interface LogoProps {
+  size?: number;
+}
+
 /** Player Scout brand mark — a cricket ball with a gold seam. Themes via currentColor + accent. */
-export default function Logo({ size = 28 }: { size?: number }) {
+export function Logo({ size = 28 }: LogoProps) {
   return (
     <svg
       width={size}

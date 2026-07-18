@@ -1,33 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import Link from "next/link";
-import SectionHeading from "@/components/SectionHeading";
-import SimilarityBadge from "@/components/SimilarityBadge";
-import { getTeamFit, getTeams } from "@/lib/api";
-import type { TeamFitResponse, TeamProfile } from "@/lib/types";
+import { EmptyState } from "@/components/feedback/EmptyState";
+import { SectionHeading } from "@/components/ui/SectionHeading";
+import { SimilarityBadge } from "@/components/ui/SimilarityBadge";
+import { useTeamFit } from "@/features/team-fit";
 
 export default function TeamFitPage() {
-  const [teams, setTeams] = useState<TeamProfile[]>([]);
-  const [selected, setSelected] = useState<string | null>(null);
-  const [fit, setFit] = useState<TeamFitResponse | null>(null);
-  const [busy, setBusy] = useState(false);
-
-  useEffect(() => {
-    getTeams().then(setTeams).catch(() => {});
-  }, []);
-
-  async function select(teamId: string) {
-    setSelected(teamId);
-    setBusy(true);
-    try {
-      setFit((await getTeamFit(teamId, 5)) ?? null);
-    } finally {
-      setBusy(false);
-    }
-  }
-
-  const team = teams.find((t) => t.id === selected);
+  const { teams, selected, team, fit, busy, select } = useTeamFit();
 
   return (
     <div className="space-y-8">
@@ -81,7 +61,7 @@ export default function TeamFitPage() {
         </section>
       )}
 
-      {busy && <p className="text-sm text-ink-muted">Matching players…</p>}
+      {busy && <EmptyState message="Matching players…" />}
 
       {fit && !busy && (
         <section className="space-y-4">
@@ -109,9 +89,7 @@ export default function TeamFitPage() {
         </section>
       )}
 
-      {!selected && teams.length > 0 && (
-        <p className="text-sm text-ink-muted">Pick a franchise to see recommendations.</p>
-      )}
+      {!selected && teams.length > 0 && <EmptyState message="Pick a franchise to see recommendations." />}
     </div>
   );
 }

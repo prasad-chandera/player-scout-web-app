@@ -17,7 +17,7 @@ function currentTheme(): Theme {
   return systemTheme();
 }
 
-export default function ThemeToggle() {
+export function ThemeToggle() {
   // `mounted` guards against SSR/client mismatch — the server can't know the theme.
   const [mounted, setMounted] = useState(false);
   const [theme, setTheme] = useState<Theme>("dark");

@@ -1,13 +1,11 @@
-/** Broadcast stat tile — tiny label over a big condensed number. */
-export default function StatTile({
-  label,
-  value,
-  tone = "default",
-}: {
+export interface StatTileProps {
   label: string;
   value: string;
   tone?: "default" | "gold" | "green";
-}) {
+}
+
+/** Broadcast stat tile — tiny label over a big condensed number. */
+export function StatTile({ label, value, tone = "default" }: StatTileProps) {
   const valueColor =
     tone === "gold" ? "text-accent" : tone === "green" ? "text-series" : "text-foreground";
   return (

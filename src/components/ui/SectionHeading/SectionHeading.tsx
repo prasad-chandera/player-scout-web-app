@@ -1,11 +1,10 @@
-/** Condensed section heading with the 22-yard pitch-line accent. */
-export default function SectionHeading({
-  children,
-  sub,
-}: {
+export interface SectionHeadingProps {
   children: React.ReactNode;
   sub?: string;
-}) {
+}
+
+/** Condensed section heading with the 22-yard pitch-line accent. */
+export function SectionHeading({ children, sub }: SectionHeadingProps) {
   return (
     <div className="space-y-2">
       <h2 className="font-display text-xl font-semibold uppercase tracking-wide">{children}</h2>

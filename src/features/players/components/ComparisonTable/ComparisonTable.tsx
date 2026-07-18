@@ -1,18 +1,16 @@
 import type { FeatureContribution } from "@/lib/types";
 
+export interface ComparisonTableProps {
+  referenceName: string;
+  candidateName: string;
+  contributions: FeatureContribution[];
+}
+
 /**
  * The side-by-side "why are these players similar" table — one row per feature,
  * with each feature's share of the similarity score.
  */
-export default function ComparisonTable({
-  referenceName,
-  candidateName,
-  contributions,
-}: {
-  referenceName: string;
-  candidateName: string;
-  contributions: FeatureContribution[];
-}) {
+export function ComparisonTable({ referenceName, candidateName, contributions }: ComparisonTableProps) {
   return (
     <div className="card overflow-x-auto rounded-2xl">
       <table className="w-full text-sm">

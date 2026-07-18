@@ -1,13 +1,11 @@
 import { notFound } from "next/navigation";
-import AISummaryCard from "@/components/AISummaryCard";
-import ComparisonTable from "@/components/ComparisonTable";
-import PhaseBarChart from "@/components/PhaseBarChart";
-import PlayerCard from "@/components/PlayerCard";
-import RadarChartCard from "@/components/RadarChartCard";
-import SectionHeading from "@/components/SectionHeading";
-import SimilarityBadge from "@/components/SimilarityBadge";
-import StatTile from "@/components/StatTile";
-import { explainPlayer, getPlayer, getSimilar } from "@/lib/api";
+import { PlayerCard } from "@/components/ui/PlayerCard";
+import { SectionHeading } from "@/components/ui/SectionHeading";
+import { SimilarityBadge } from "@/components/ui/SimilarityBadge";
+import { StatTile } from "@/components/ui/StatTile";
+import { AISummaryCard, ComparisonTable, PhaseBarChart, RadarChartCard } from "@/features/players";
+import { MOCK_EXPLANATIONS, MOCK_PLAYERS, genericExplanation } from "@/lib/mock/players";
+import { similarTo } from "@/lib/query";
 
 export default async function PlayerDetailPage({
   params,
@@ -15,14 +13,12 @@ export default async function PlayerDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const player = await getPlayer(id);
+  const player = MOCK_PLAYERS.find((p) => p.id === id);
   if (!player) notFound();
 
-  const [similar, explanation] = await Promise.all([
-    getSimilar(id, { limit: 4 }),
-    explainPlayer(id),
-  ]);
-  const closest = similar?.results[0];
+  const similar = similarTo(player, 4, false);
+  const explanation = MOCK_EXPLANATIONS[id] ?? genericExplanation(player);
+  const closest = similar[0];
 
   const roleLabel =
     player.role === "allrounder" ? "All-rounder" : player.role[0].toUpperCase() + player.role.slice(1);
@@ -82,11 +78,11 @@ export default async function PlayerDetailPage({
         </section>
       )}
 
-      {similar && similar.results.length > 1 && (
+      {similar.length > 1 && (
         <section className="space-y-4">
           <SectionHeading>Similar players</SectionHeading>
           <div className="grid gap-3">
-            {similar.results.slice(1).map((r) => (
+            {similar.slice(1).map((r) => (
               <PlayerCard key={r.player.id} player={r.player} similarity={r.similarity} />
             ))}
           </div>

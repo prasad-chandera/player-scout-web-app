@@ -1,6 +1,6 @@
 import Link from "next/link";
+import { SimilarityBadge } from "@/components/ui/SimilarityBadge";
 import type { PlayerSummary } from "@/lib/types";
-import SimilarityBadge from "@/components/SimilarityBadge";
 
 const ROLE_LABEL: Record<PlayerSummary["role"], string> = {
   batter: "Batter",
@@ -15,17 +15,15 @@ const ROLE_ACCENT: Record<PlayerSummary["role"], string> = {
   allrounder: "var(--ball)",
 };
 
-export default function PlayerCard({
-  player,
-  similarity,
-  reason,
-}: {
+export interface PlayerCardProps {
   player: PlayerSummary;
   /** 0–1, shown when the card comes from a similarity search */
   similarity?: number;
   /** why this player matched — shown instead of tags when present */
   reason?: string;
-}) {
+}
+
+export function PlayerCard({ player, similarity, reason }: PlayerCardProps) {
   return (
     <Link
       href={`/players/${player.id}`}

@@ -1,17 +1,25 @@
 import Link from "next/link";
-import SectionHeading from "@/components/SectionHeading";
-import ValueScatter from "@/components/ValueScatter";
-import { getUndervalued } from "@/lib/api";
-
-function lakh(v: number) {
-  return v >= 100 ? `₹${(v / 100).toFixed(1)} Cr` : `₹${v} L`;
-}
+import { ValueScatter } from "@/features/undervalued";
+import { MOCK_PLAYERS, UNDERVALUED_DISCLAIMER } from "@/lib/mock/players";
+import { toSummary } from "@/lib/query";
+import { formatLakh } from "@/lib/utils";
 
 // Medallion colors for the top 3.
 const MEDAL = ["var(--accent)", "#9fb0a5", "#b87333"];
 
-export default async function UndervaluedPage() {
-  const { players, disclaimer } = await getUndervalued(10);
+export default function UndervaluedPage() {
+  const players = MOCK_PLAYERS.filter((p) => p.competition === "smat")
+    .map((p) => ({
+      player: toSummary(p),
+      expectedPriceLakh: p.expectedPriceLakh,
+      expectedValueLakh: p.expectedValueLakh,
+      valueGapLakh: p.expectedValueLakh - p.expectedPriceLakh,
+      reasons: p.tags,
+    }))
+    .sort((a, b) => b.valueGapLakh - a.valueGapLakh)
+    .slice(0, 10)
+    .map((e, i) => ({ ...e, rank: i + 1 }));
+  const disclaimer = UNDERVALUED_DISCLAIMER;
 
   return (
     <div className="space-y-8">
@@ -67,10 +75,10 @@ export default async function UndervaluedPage() {
                   <span className="ml-2 text-[11px] uppercase tracking-wide text-ink-muted">{e.player.role}</span>
                 </td>
                 <td className="px-4 py-3 text-right font-display font-semibold tabular-nums">{e.player.readiness}</td>
-                <td className="px-4 py-3 text-right tabular-nums text-ink-secondary">{lakh(e.expectedPriceLakh)}</td>
-                <td className="px-4 py-3 text-right tabular-nums text-ink-secondary">{lakh(e.expectedValueLakh)}</td>
+                <td className="px-4 py-3 text-right tabular-nums text-ink-secondary">{formatLakh(e.expectedPriceLakh)}</td>
+                <td className="px-4 py-3 text-right tabular-nums text-ink-secondary">{formatLakh(e.expectedValueLakh)}</td>
                 <td className="px-4 py-3 text-right font-display text-base font-bold tabular-nums text-accent">
-                  +{lakh(e.valueGapLakh)}
+                  +{formatLakh(e.valueGapLakh)}
                 </td>
                 <td className="hidden px-4 py-3 text-ink-secondary sm:table-cell">{e.reasons.slice(0, 2).join(" · ")}</td>
               </tr>

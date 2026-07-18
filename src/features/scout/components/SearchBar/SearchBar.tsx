@@ -10,13 +10,12 @@ const ROLES: { value: Role | undefined; label: string }[] = [
   { value: "allrounder", label: "All-rounders" },
 ];
 
-export default function SearchBar({
-  onSearch,
-  busy,
-}: {
+export interface SearchBarProps {
   onSearch: (query: string, role?: Role) => void;
   busy?: boolean;
-}) {
+}
+
+export function SearchBar({ onSearch, busy }: SearchBarProps) {
   const [text, setText] = useState("");
   const [role, setRole] = useState<Role | undefined>(undefined);
 

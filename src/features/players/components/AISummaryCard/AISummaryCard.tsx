@@ -1,7 +1,11 @@
 import type { Explanation } from "@/lib/types";
 
+export interface AISummaryCardProps {
+  explanation: Explanation;
+}
+
 /** Claude's grounded scouting report, rendered as cards (never a text blob). */
-export default function AISummaryCard({ explanation }: { explanation: Explanation }) {
+export function AISummaryCard({ explanation }: AISummaryCardProps) {
   return (
     <div className="card overflow-hidden rounded-2xl p-5">
       <div className="flex items-center gap-2">

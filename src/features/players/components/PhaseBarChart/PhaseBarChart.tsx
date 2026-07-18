@@ -18,8 +18,13 @@ const PHASE_LABEL: Record<PhaseStat["phase"], string> = {
   death: "Death (16–20)",
 };
 
+export interface PhaseBarChartProps {
+  role: Role;
+  phaseStats: PhaseStat[];
+}
+
 /** Phase-wise economy (bowlers) or strike rate (batters); single hue, direct labels. */
-export default function PhaseBarChart({ role, phaseStats }: { role: Role; phaseStats: PhaseStat[] }) {
+export function PhaseBarChart({ role, phaseStats }: PhaseBarChartProps) {
   const isBatter = role === "batter";
   const metric = isBatter ? "Strike rate" : "Economy";
   const data = phaseStats.map((p) => ({
