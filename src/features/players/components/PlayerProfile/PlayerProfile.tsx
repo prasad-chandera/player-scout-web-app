@@ -1,5 +1,6 @@
 "use client";
 
+import { AILoader } from "@/components/ui/AILoader";
 import { ErrorState } from "@/components/feedback/ErrorState";
 import { PlayerCard } from "@/components/ui/PlayerCard";
 import { RoleIcon, ROLE_META } from "@/components/ui/RoleIcon";
@@ -16,7 +17,7 @@ import { RadarChartCard } from "@/features/players/components/RadarChartCard";
 export function PlayerProfile({ id }: { id: string }) {
   const { details, radar, phase, similar, closest, comparison } = usePlayerProfile(id);
 
-  if (details.isPending) return <ProfileSkeleton />;
+  if (details.isPending) return <AILoader label="Analyzing this player" />;
 
   if (details.isError) {
     const notFound = details.error instanceof ApiError && details.error.status === 404;
@@ -73,14 +74,14 @@ export function PlayerProfile({ id }: { id: string }) {
 
       <div className="grid gap-6 md:grid-cols-2">
         {radar.isPending ? (
-          <LoadingCard label="Loading skill radar…" />
+          <AILoader card messages={["Computing skill radar…", "Reading skill vectors…"]} />
         ) : radar.data ? (
           <RadarChartCard name={player.name} scores={radar.data.scores} />
         ) : (
           <NoDataCard label="Skill radar not available for this player." />
         )}
         {phase.isPending ? (
-          <LoadingCard label="Loading phase figures…" />
+          <AILoader card messages={["Crunching phase figures…", "Splitting powerplay · middle · death…"]} />
         ) : phase.data ? (
           <PhaseBarChart role={player.role} phases={phase.data.phases} />
         ) : (
@@ -88,7 +89,9 @@ export function PlayerProfile({ id }: { id: string }) {
         )}
       </div>
 
-      {closest && comparison.isPending && <LoadingCard label="Comparing skill profiles…" />}
+      {closest && comparison.isPending && (
+        <AILoader card messages={["Comparing skill profiles…", "Explaining the match…"]} />
+      )}
       {closest && comparison.data && (
         <section className="space-y-4">
           <SectionHeading>
@@ -114,7 +117,7 @@ export function PlayerProfile({ id }: { id: string }) {
       <section className="space-y-4">
         <SectionHeading>Similar players</SectionHeading>
         {similar.isPending ? (
-          <LoadingCard label="Finding similar players…" />
+          <AILoader card messages={["Finding similar players…", "Ranking by match score…"]} />
         ) : similar.data && similar.data.players.length > 0 ? (
           <div className="grid gap-3">
             {similar.data.players.map((sp) => (
@@ -129,45 +132,10 @@ export function PlayerProfile({ id }: { id: string }) {
   );
 }
 
-function LoadingCard({ label }: { label: string }) {
-  return (
-    <div className="card flex items-center justify-center rounded-2xl p-8 text-sm text-ink-muted">
-      <span className="animate-pulse">{label}</span>
-    </div>
-  );
-}
-
 function NoDataCard({ label }: { label: string }) {
   return (
     <div className="card flex items-center justify-center rounded-2xl p-4 text-sm text-ink-muted">
       {label}
-    </div>
-  );
-}
-
-/** Header + charts skeleton shown while the core details request is in flight. */
-function ProfileSkeleton() {
-  return (
-    <div className="space-y-8">
-      <section className="card rounded-2xl p-6">
-        <div className="flex flex-wrap items-center gap-5">
-          <div className="size-20 shrink-0 animate-pulse rounded-2xl bg-surface" />
-          <div className="min-w-0 flex-1 space-y-3">
-            <div className="h-8 w-1/2 animate-pulse rounded bg-surface" />
-            <div className="h-4 w-3/4 animate-pulse rounded bg-surface" />
-          </div>
-          <div className="size-[92px] shrink-0 animate-pulse rounded-full bg-surface" />
-        </div>
-        <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
-          {Array.from({ length: 4 }).map((_, i) => (
-            <div key={i} className="h-16 animate-pulse rounded-xl bg-surface" />
-          ))}
-        </div>
-      </section>
-      <div className="grid gap-6 md:grid-cols-2">
-        <div className="h-64 animate-pulse rounded-2xl bg-surface" />
-        <div className="h-64 animate-pulse rounded-2xl bg-surface" />
-      </div>
     </div>
   );
 }
