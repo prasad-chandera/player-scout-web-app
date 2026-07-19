@@ -13,6 +13,18 @@ export interface PlayerCardProps {
 
 export function PlayerCard({ player, matchScore, reason }: PlayerCardProps) {
   const role = ROLE_META[player.role];
+
+  // Descriptive meta, in reading order — each part only shown when the backend has it.
+  const meta = [
+    player.age ? `${player.age.years} yrs` : null,
+    player.battingHand ? `${player.battingHand[0].toUpperCase()}${player.battingHand.slice(1)}-hand bat` : null,
+    player.bowlingStyle,
+    `${player.matches} ${player.matches === 1 ? "match" : "matches"}`,
+    `${player.innings} inns`,
+  ]
+    .filter(Boolean)
+    .join(" · ");
+
   return (
     <Link
       href={`/players/${player.id}`}
@@ -25,13 +37,23 @@ export function PlayerCard({ player, matchScore, reason }: PlayerCardProps) {
         aria-hidden
       />
       <div
-        className="flex size-12 shrink-0 items-center justify-center rounded-full font-display text-base font-bold text-foreground ring-2"
+        className="flex size-12 shrink-0 items-center justify-center overflow-hidden rounded-full font-display text-base font-bold text-foreground ring-2"
         style={{
           background: `color-mix(in srgb, ${role.accent} 12%, var(--surface))`,
           color: role.accent,
         }}
       >
-        {player.name.split(" ").map((w) => w[0]).slice(0, 2).join("")}
+        {player.imageUrl ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={player.imageUrl}
+            alt=""
+            className="size-full object-cover"
+            loading="lazy"
+          />
+        ) : (
+          player.name.split(" ").map((w) => w[0]).slice(0, 2).join("")
+        )}
       </div>
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-2">
@@ -48,30 +70,25 @@ export function PlayerCard({ player, matchScore, reason }: PlayerCardProps) {
             <RoleIcon role={player.role} size={13} />
             {role.label}
           </span>
-          {/* relevance signal — distinct from the impact ring (green pill, not a gauge) */}
-          {matchScore !== undefined && (
-            <span
-              className="ml-auto inline-flex shrink-0 items-center gap-1 rounded-full border px-2 py-0.5 text-[11px] font-semibold tabular-nums text-series"
-              style={{
-                background: "color-mix(in srgb, var(--brand) 12%, transparent)",
-                borderColor: "color-mix(in srgb, var(--brand) 30%, transparent)",
-              }}
-              title={`${Math.round(matchScore)}% similarity match`}
-            >
-              <span className="size-1.5 rounded-full bg-series" aria-hidden />
-              {Math.round(matchScore)}% match
-            </span>
-          )}
+          
         </div>
-        {reason ? (
-          <p className="mt-1 text-[12px] text-ink-secondary">{reason}</p>
-        ) : (
-          <div className="mt-1 flex flex-wrap gap-1.5">
-            {player.tags.slice(0, 3).map((t) => (
-              <span key={t} className="rounded-full bg-surface px-2 py-0.5 text-[11px] text-ink-secondary ring-1 ring-[var(--border)]">
+        {/* identity + track record — style, hand, age, and how much cricket backs the score */}
+        <p className="mt-1 truncate text-[12px] tabular-nums text-ink-muted" title={meta}>
+          {meta}
+        </p>
+        {player.teams.length > 0 && (
+          <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
+            {player.teams.slice(0, 3).map((t) => (
+              <span
+                key={t}
+                className="rounded-full bg-surface px-2 py-0.5 text-[11px] text-ink-secondary ring-1 ring-[var(--border)]"
+              >
                 {t}
               </span>
             ))}
+            {player.teams.length > 3 && (
+              <span className="text-[11px] text-ink-muted">+{player.teams.length - 3}</span>
+            )}
           </div>
         )}
       </div>

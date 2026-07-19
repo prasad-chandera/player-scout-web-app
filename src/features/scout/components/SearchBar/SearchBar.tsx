@@ -47,22 +47,6 @@ export function SearchBar({ onSearch, busy }: SearchBarProps) {
           {busy ? "Scouting…" : "Scout"}
         </button>
       </div>
-      <div className="flex flex-wrap gap-2">
-        {ROLES.map((r) => (
-          <button
-            key={r.label}
-            type="button"
-            onClick={() => setRole(r.value)}
-            className={`rounded-full border px-3.5 py-1.5 text-sm font-medium transition-colors ${
-              role === r.value
-                ? "border-transparent bg-series text-on-primary"
-                : "border-hairline text-ink-secondary hover:border-series hover:text-foreground"
-            }`}
-          >
-            {r.label}
-          </button>
-        ))}
-      </div>
     </form>
   );
 }
