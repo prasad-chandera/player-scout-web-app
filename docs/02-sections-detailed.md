@@ -1,14 +1,22 @@
-# ScoutIQ — Detailed Section-by-Section Design
+# Player Scout — Detailed Section-by-Section Design
 
-Each section below covers one stage of the pipeline: what it does, its inputs and outputs, how to build it within hackathon time, and the pitfalls to avoid.
+> **Status note.** This document predates the current 6-endpoint contract in
+> [03-api-endpoints-and-ai.md](./03-api-endpoints-and-ai.md), which is authoritative.
+> Sections 1–2 (data layer, feature engineering) and the skill-radar / phase-figure
+> concepts still hold. The **Readiness Score (§4), Undervalued Index (§5), Team Fit (§6),
+> and Claude explanation layer (§7) are no longer part of the product** — the player's
+> single 0–100 impact score, a 0–10 skill radar, phase figures, and a similarity match
+> score replaced them. §3.1 (LLM smart-search) survives in spirit: an LLM still parses
+> free text into filters, but for `GET /players/search` (and a player name for
+> `GET /players/similar`), never ranking. §8 below has been updated to the current UI.
+
+Each section below covers one stage of the pipeline: what it does, its inputs and outputs, and the pitfalls to avoid.
 
 Pipeline recap:
 
 ```
-Data layer → Feature engineering → Player vectors
-    → Similarity engine ┐
-    → Readiness score   ├→ Node.js API → Claude explanation → Next.js UI
-    → Undervalued index ┘
+Data layer → Feature engineering → Player catalogue (impact score, skill radar, phase figures)
+    → Similarity engine → Node.js API → LLM (parse / narrate only) → Next.js UI
 ```
 
 ---
@@ -119,6 +127,22 @@ Candidate  → [0.66,   0.93,      0.89,   0.80,   0.74,  0.85,  0.90,        0.
 
 **Pitfall:** cosine ignores magnitude, so a uniformly mediocre player can be "shaped like" Bumrah at a lower level. Mitigate by reporting similarity **alongside** the readiness score (Section 4), and show both in results.
 
+### 3.1 Smart natural-language search (Gemini — backend-owned)
+
+**What it does:** lets a scout type a plain sentence — *"a left-arm death bowler under ₹50 lakh strong against right-handers"* — instead of picking filters. **Gemini (in the backend)** converts the sentence into a structured `SearchIntent`; the deterministic engine below does the actual filtering and ranking.
+
+**Pipeline:**
+```
+free text → Gemini → SearchIntent (role, style, price cap, sortBy feature, "next <name>", …)
+          → executeIntent(): reference-player → cosine similarity (Section 3)
+                             otherwise        → filter + sort by the requested feature
+          → results + an "Interpreted as" chip row (shows the parsed intent)
+```
+
+**Why it's safe / on-thesis:** the LLM is a **translator, not a ranker** — it never sees a stat or invents a number; it only maps language onto a closed vocabulary of filters (valid roles, styles, feature keys, known names). Surfacing the parsed intent as chips keeps the whole thing auditable.
+
+**Two safety nets:** (1) if the Gemini key is absent or the call fails, a keyword parser produces the same `SearchIntent` shape, so search never hard-fails; (2) the frontend ships that same keyword parser (`src/lib/query.ts`) for mock mode, so the demo runs with no backend at all. Full spec: doc 03 endpoint 4b + §AI-5.
+
 ---
 
 ## Section 4 — IPL Readiness Score
@@ -208,29 +232,22 @@ Full prompt drafts, model choice, and API shapes are in [03-api-endpoints-and-ai
 
 ## Section 8 — Frontend (this repo)
 
-Next.js App Router + TypeScript + Tailwind CSS + Recharts. All pages render from typed mock data until the backend is live (`lib/api.ts` has a `USE_MOCK` switch).
+Next.js App Router + TypeScript + Tailwind CSS + Recharts. Two routes only; all data comes
+from the live backend via `src/lib/api.ts` (typed against `src/lib/types/`).
 
-### Page 1 — `/` Search & Results
-- Hero search bar: free text ("Find the next Bumrah") + role filter chips (Batter / Bowler / All-rounder).
-- Results: ranked `PlayerCard` list — name, role, similarity % badge, readiness score, top-3 reason tags.
-- Chart: none (keep it fast); similarity % rendered as a radial badge.
+### Page 1 — `/` Discover (search)
+- Hero search bar: free text + role filter chips (Batter / Bowler / All-rounder), folded into the query string.
+- Before a search: an empty prompt state (no "list all players" endpoint exists).
+- Results (`GET /players/search`): the parsed `interpretation` chip + a ranked `PlayerCard` list — name, role, impact-score badge, estimated price band.
 
-### Page 2 — `/players/[id]` Player Detail (the money page)
-- Header: name, role, competition, readiness score dial.
-- **Radar chart** (Recharts `RadarChart`): skill groups — batting, bowling, fielding, pressure, consistency.
-- **Phase-wise bars** (Recharts `BarChart`): powerplay / middle / death economy or SR.
-- **Comparison table** (`ComparisonTable`): candidate vs reference player, one row per feature, with the per-feature similarity contribution highlighted — the Bumrah-vs-candidate table from the vision.
-- **AI scouting report** (`AISummaryCard`): Claude's summary, strengths, weaknesses as cards.
-- **Best-fit teams** strip: top-3 franchise logos with fit reason.
-
-### Page 3 — `/undervalued` Undervalued Talent
-- Top-10 table: rank, player, expected auction price, expected value, value gap (highlighted), reason tags.
-- Optional chart (Recharts `ScatterChart`): x = expected price, y = readiness — undervalued players are the top-left cluster; visually the single best "Moneyball" slide of the demo.
-
-### Page 4 — `/team-fit` Team Fit (stretch)
-- Franchise selector (10 cards with team colors) → needs profile shown → ranked recommended players with matched-need explanations.
+### Page 2 — `/players/[id]` Player Detail
+- Header (`GET /players/{id}`): name, role, competition, battingHand/bowlingStyle, age, teams, an impact/readiness dial, and the estimated price band.
+- **Radar chart** (`GET /players/{id}/skill-radar`, Recharts `RadarChart`): batting, bowling, fielding, pressure, consistency (0–10 axes).
+- **Phase-wise bars** (`GET /players/{id}/economy-by-phase`, Recharts `BarChart`): powerplay / middle / death economy or strike rate.
+- **Similar players** (`GET /players/similar?query=…like {name}`): ranked `PlayerCard` list with match scores.
+- **Why similar** (`GET /players/{id}/similar/{candidateId}`, `ComparisonTable`): the verdict, a per-axis seed-vs-candidate table with each axis's share of the similarity, and the notable differences.
 
 ### Shared components
-`PlayerCard`, `SimilarityBadge`, `RadarChartCard`, `ComparisonTable`, `AISummaryCard`, `SearchBar` — all presentational, typed against `src/lib/types.ts`, which mirrors the response shapes in doc 03 exactly.
+`PlayerCard`, `SimilarityBadge`, `RadarChartCard`, `PhaseBarChart`, `ComparisonTable`, `SearchBar` — all presentational, typed against `src/lib/types/`.
 
-**Pitfall:** don't hand-roll charts — Recharts' `RadarChart`/`BarChart`/`ScatterChart` cover all four pages. Spend the saved time on the comparison table, which is the most persuasive artifact in the demo.
+**Pitfall:** phase and radar figures can be `null` (a specialist bowler has no strike rate; some players can't be radar-scored) — render a greyed/empty state, never a zero.

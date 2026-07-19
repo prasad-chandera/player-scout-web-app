@@ -1,4 +1,4 @@
-# ScoutIQ — Data Sources & Ingestion Pipeline
+# Player Scout — Data Sources & Ingestion Pipeline
 
 Everything the project needs is public and free. This doc lists each source, exactly what it feeds, and the step-by-step pipeline from download to `players.json` / Postgres seed.
 
@@ -77,19 +77,16 @@ Field → feature mapping:
 
 Canonical ID for every player across competitions — this is how the same bowler's SMAT and IPL records get joined. **Always join on this ID, never on name strings** (spellings differ between files).
 
-## 3. Kaggle — auction prices & player metadata
+## 3. Player metadata (names, hand, style, age, photos)
 
-Needed for the **Undervalued Talent page** (expected price) and for bowler-type/batting-hand lookups. Search Kaggle for:
+Player names, batting hand, bowling style, date of birth and photos are **not** in
+Cricsheet. The backend cross-references Wikidata/Wikipedia (see the backend's
+`playerProfiles` service) to fill these in where it can; coverage is partial and every one
+of these fields stays `null` when unmatched.
 
-| Search term | What you get | Feeds |
-|---|---|---|
-| "IPL auction dataset" / "IPL player auction prices" (e.g. *IPL Player Auction Dataset (2013–2025)*) | Sold price, base price, team, year per player | `expectedPriceLakh`, value-gap calibration |
-| "IPL complete dataset ball by ball" (e.g. *IPL Complete Dataset 2008–2024*) | Alternative pre-flattened CSVs if you'd rather skip JSON parsing for IPL | Convenience only — Cricsheet remains the source of truth |
-| "cricket players profile dataset" | Batting hand, bowling style, DOB | Bowler-type & handedness lookups (spin/pace, LHB/RHB splits), age |
-
-> Kaggle requires a free account. Dataset titles change — search by the terms above rather than relying on one exact title. Spot-check a few known prices (e.g. recent marquee sales) before trusting any auction CSV.
-
-**Uncapped players' base prices:** official IPL auction lists (published by BCCI each season, widely mirrored in news coverage) put uncapped players at ₹20–40 lakh base price. For demo purposes, `expectedPriceLakh` for an uncapped SMAT player = their base price bracket — which is precisely the "undervalued" story.
+The player's `estimatedPriceRange` (the price band shown in the UI) is **derived from the
+backend's auction/impact scoring** (`scoring.ts`), not read from an external price feed —
+it's a current market-tier estimate, not a historical price.
 
 ## 4. ESPNcricinfo Statsguru — verification only
 
@@ -122,19 +119,20 @@ Step 3  Metadata join        people.csv IDs + Kaggle metadata
                              (bowling style, hand, age) + auction prices  (~1–2 h)
 Step 4  Filter               ≥10 matches AND (≥120 balls faced or bowled);
                              per-feature minimum samples (≥30 balls/phase)(~30 min)
-Step 5  Normalize & score    0–1 per feature per role → vectors →
-                             readiness scores (weights from doc 02 §4)    (~1–2 h)
-Step 6  Emit                 players.json + Postgres seed; pre-warm
-                             Claude explanation cache (doc 03 §AI-3)      (~1 h)
+Step 5  Normalize & score    per-role scaling → impact score, skill-radar
+                             axes, and phase figures                      (~1–2 h)
+Step 6  Emit                 in-memory catalogue + persistence            (~1 h)
 ```
 
-**Expected output size:** 300–500 players (SMAT pool after filtering) + ~150 IPL reference players. Small enough that the entire dataset lives in backend memory; Postgres is for persistence and the explanation cache.
+**Expected output size:** a few hundred players (SMAT pool after filtering) + IPL reference players. Small enough that the entire dataset lives in backend memory.
 
-**Script language:** the ingestion script is offline and throwaway-ish — Node.js keeps the whole stack one language; Python/pandas is fine too if faster for you. Its only contract is the output shape consumed by the backend (doc 03 endpoint 2).
+**Script language:** the ingestion script is offline — Node.js keeps the whole stack one language; Python/pandas is fine too. Its only contract is the output shape consumed by the backend (doc 03).
 
-## 7. Mock-data fallback (already in this repo)
+## 7. No frontend mock data
 
-The frontend ships with `src/lib/mock/players.ts` — ~10 hand-written players matching the doc 03 response shapes exactly, so **all UI pages render before any real data exists**. Keep mock stats plausible (economies 6–9, SRs 110–160) so charts look right. When the backend is live, flip `NEXT_PUBLIC_USE_MOCK=false` — no component changes needed.
+The frontend no longer ships bundled mock data — it calls the backend directly through
+`src/lib/api.ts`. Point `NEXT_PUBLIC_API_URL` at the API base (e.g.
+`https://api.pssc.livetronics.ai/api`) to see players.
 
 ## 8. Licensing & attribution checklist
 
