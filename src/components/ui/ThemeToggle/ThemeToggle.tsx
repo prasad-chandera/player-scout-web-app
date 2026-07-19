@@ -1,43 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
-
-type Theme = "light" | "dark";
-
-const STORAGE_KEY = "scoutiq-theme";
-
-function systemTheme(): Theme {
-  return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
-}
-
-/** Reads the theme the anti-FOUC script already resolved on <html>. */
-function currentTheme(): Theme {
-  const attr = document.documentElement.dataset.theme;
-  if (attr === "light" || attr === "dark") return attr;
-  return systemTheme();
-}
+import { useTheme } from "@/lib/hooks/useTheme";
 
 export function ThemeToggle() {
-  // `mounted` guards against SSR/client mismatch — the server can't know the theme.
-  const [mounted, setMounted] = useState(false);
-  const [theme, setTheme] = useState<Theme>("dark");
-
-  useEffect(() => {
-    setTheme(currentTheme());
-    setMounted(true);
-  }, []);
-
-  function toggle() {
-    const next: Theme = theme === "dark" ? "light" : "dark";
-    setTheme(next);
-    document.documentElement.dataset.theme = next;
-    try {
-      localStorage.setItem(STORAGE_KEY, next);
-    } catch {
-      // ignore (private mode etc.) — theme still applies for this session
-    }
-  }
-
+  const { theme, toggle, mounted } = useTheme();
   const isDark = theme === "dark";
 
   return (
@@ -46,7 +12,7 @@ export function ThemeToggle() {
       onClick={toggle}
       aria-label={mounted ? `Switch to ${isDark ? "light" : "dark"} theme` : "Toggle theme"}
       title={mounted ? `Switch to ${isDark ? "light" : "dark"} theme` : "Toggle theme"}
-      className="ml-auto flex size-9 items-center justify-center rounded-lg border border-hairline text-ink-secondary transition-colors hover:bg-surface hover:text-foreground"
+      className="flex size-9 items-center justify-center rounded-lg border border-hairline text-ink-secondary transition-colors hover:bg-surface hover:text-foreground"
     >
       {/* Render an icon only after mount to avoid a hydration mismatch. */}
       {mounted && (isDark ? <SunIcon /> : <MoonIcon />)}

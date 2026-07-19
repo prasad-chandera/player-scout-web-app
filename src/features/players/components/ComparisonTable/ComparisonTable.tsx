@@ -1,16 +1,16 @@
-import type { FeatureContribution } from "@/lib/types";
+import type { PlayerComparisonFeatureRow } from "@/lib/types";
 
 export interface ComparisonTableProps {
   referenceName: string;
   candidateName: string;
-  contributions: FeatureContribution[];
+  rows: PlayerComparisonFeatureRow[];
 }
 
 /**
- * The side-by-side "why are these players similar" table — one row per feature,
- * with each feature's share of the similarity score.
+ * The side-by-side "why are these players similar" table — one row per skill axis,
+ * with each axis's share of the overall similarity.
  */
-export function ComparisonTable({ referenceName, candidateName, contributions }: ComparisonTableProps) {
+export function ComparisonTable({ referenceName, candidateName, rows }: ComparisonTableProps) {
   return (
     <div className="card overflow-x-auto rounded-2xl">
       <table className="w-full text-sm">
@@ -23,19 +23,19 @@ export function ComparisonTable({ referenceName, candidateName, contributions }:
           </tr>
         </thead>
         <tbody>
-          {contributions.map((c) => (
+          {rows.map((c) => (
             <tr key={c.feature} className="border-b border-hairline transition-colors last:border-0 hover:bg-surface">
               <td className="px-4 py-3 text-ink-secondary">{c.label}</td>
-              <td className="px-4 py-3 font-display font-semibold tabular-nums">{c.referenceValue}</td>
+              <td className="px-4 py-3 font-display font-semibold tabular-nums">{c.seedValue}</td>
               <td className="px-4 py-3 font-display font-semibold tabular-nums">{c.candidateValue}</td>
               <td className="px-4 py-3">
                 <div className="flex items-center justify-end gap-2">
                   <span
                     className="h-2.5 rounded-full"
-                    style={{ width: `${Math.round(c.contribution * 200)}px`, maxWidth: 96, background: "var(--grad-brand)" }}
+                    style={{ width: `${Math.min(Math.round(c.shareOfSimilarity), 96)}px`, maxWidth: 96, background: "var(--grad-brand)" }}
                   />
                   <span className="w-10 text-right font-display font-semibold tabular-nums text-ink-secondary">
-                    {Math.round(c.contribution * 100)}%
+                    {Math.round(c.shareOfSimilarity)}%
                   </span>
                 </div>
               </td>

@@ -1,4 +1,4 @@
-// Scout feature — search + IPL-readiness rankings (the home page).
+// Scout feature — natural-language player search (the Discover / home page).
 // Import the hook, models and components from here.
 export * from "./hooks";
 export * from "./models";

@@ -6,13 +6,13 @@ import { SectionHeading } from "@/components/ui/SectionHeading";
 import { SearchBar, useScout } from "@/features/scout";
 
 export default function ScoutPage() {
-  const { rankings, search, error, busy, runSearch } = useScout();
+  const { result, hasSearched, error, busy, runSearch } = useScout();
 
   return (
     <div className="space-y-10">
       <section className="hero-aura rise-in space-y-5 pt-6 pb-2 text-center">
         <span className="inline-flex items-center gap-2 rounded-full border border-hairline bg-surface px-3 py-1 text-[11px] font-semibold uppercase tracking-widest text-ink-secondary">
-          <span className="size-1.5 rounded-full bg-series" /> Moneyball for the IPL
+          <span className="size-1.5 rounded-full bg-series" /> AI scouting for domestic cricket
         </span>
         <h1 className="font-display text-5xl font-bold uppercase leading-[0.95] tracking-tight sm:text-6xl">
           Find the next
@@ -31,31 +31,35 @@ export default function ScoutPage() {
 
       {error && <ErrorState message={error} />}
 
-      {search ? (
+      {result ? (
         <section className="space-y-4">
           <div className="flex flex-wrap items-center gap-2">
             <span className="text-[11px] font-semibold uppercase tracking-widest text-ink-muted">Interpreted as</span>
             <span className="rounded-full border border-series bg-series/10 px-3 py-1 text-sm font-medium text-foreground">
-              {search.interpretation || "all players"}
+              {result.interpretation || "all players"}
             </span>
           </div>
-          <div className="grid gap-3">
-            {search.results.map((r) => (
-              <PlayerCard key={r.player.id} player={r.player} similarity={r.similarity} reason={r.matchReason} />
-            ))}
-          </div>
+          {result.players.length > 0 ? (
+            <div className="grid gap-3">
+              {result.players.map((p) => (
+                <PlayerCard key={p.id} player={p} />
+              ))}
+            </div>
+          ) : (
+            <p className="py-8 text-center text-ink-secondary">
+              No players matched that search. Try describing a role, skill, or budget.
+            </p>
+          )}
         </section>
       ) : (
-        <section className="space-y-4">
-          <SectionHeading sub="Domestic players ranked by our transparent readiness score.">
-            Highest IPL readiness
-          </SectionHeading>
-          <div className="grid gap-3">
-            {rankings.map((p) => (
-              <PlayerCard key={p.id} player={p} />
-            ))}
-          </div>
-        </section>
+        !busy &&
+        !hasSearched && (
+          <section className="space-y-3 py-8 text-center">
+            <SectionHeading sub="e.g. “a bowler at below ₹50 lakh” or “aggressive top-order batter”.">
+              Search to discover players
+            </SectionHeading>
+          </section>
+        )
       )}
     </div>
   );
