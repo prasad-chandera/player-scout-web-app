@@ -8,6 +8,9 @@ This repo is the **frontend** (Next.js App Router + TypeScript + Tailwind CSS +
 Recharts). The analytics backend is a separate Node.js project whose API contract is
 documented here; the frontend talks to it through `src/lib/api.ts`.
 
+**Live app:** https://player-scout-web-app.vercel.app/ (hosted on Vercel; needs a
+reachable backend via `NEXT_PUBLIC_API_URL` to load data).
+
 ## Documentation
 
 | File | Contents |

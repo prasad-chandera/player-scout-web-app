@@ -1,5 +1,6 @@
 "use client";
 
+import { AILoader } from "@/components/ui/AILoader";
 import { ErrorState } from "@/components/feedback/ErrorState";
 import { PlayerCard } from "@/components/ui/PlayerCard";
 import { SectionHeading } from "@/components/ui/SectionHeading";
@@ -31,7 +32,9 @@ export default function ScoutPage() {
 
       {error && <ErrorState message={error} />}
 
-      {result ? (
+      {busy ? (
+        <AILoader label="Scouting the domestic pool" />
+      ) : result ? (
         <section className="space-y-4">
           <div className="flex flex-wrap items-center gap-2">
             <span className="text-[11px] font-semibold uppercase tracking-widest text-ink-muted">Interpreted as</span>
@@ -52,7 +55,6 @@ export default function ScoutPage() {
           )}
         </section>
       ) : (
-        !busy &&
         !hasSearched && (
           <section className="space-y-3 py-8 text-center">
             <SectionHeading sub="e.g. “a bowler at below ₹50 lakh” or “aggressive top-order batter”.">
