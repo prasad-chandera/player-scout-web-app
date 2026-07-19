@@ -5,7 +5,5 @@ export { RadarChartCard } from "./components/RadarChartCard";
 export type { RadarChartCardProps } from "./components/RadarChartCard";
 export { PhaseBarChart } from "./components/PhaseBarChart";
 export type { PhaseBarChartProps } from "./components/PhaseBarChart";
-export { AISummaryCard } from "./components/AISummaryCard";
-export type { AISummaryCardProps } from "./components/AISummaryCard";
 export { ComparisonTable } from "./components/ComparisonTable";
 export type { ComparisonTableProps } from "./components/ComparisonTable";

@@ -1,24 +1,23 @@
 "use client";
 
 import { useState } from "react";
-import type { Role } from "@/lib/types";
+import type { PlayerRole } from "@/lib/types";
 
-const ROLES: { value: Role | undefined; label: string }[] = [
+const ROLES: { value: PlayerRole | undefined; label: string }[] = [
   { value: undefined, label: "All roles" },
   { value: "batter", label: "Batters" },
   { value: "bowler", label: "Bowlers" },
   { value: "allrounder", label: "All-rounders" },
-  { value: "wicketkeeper", label: "Keepers" },
 ];
 
 export interface SearchBarProps {
-  onSearch: (query: string, role?: Role) => void;
+  onSearch: (query: string, role?: PlayerRole) => void;
   busy?: boolean;
 }
 
 export function SearchBar({ onSearch, busy }: SearchBarProps) {
   const [text, setText] = useState("");
-  const [role, setRole] = useState<Role | undefined>(undefined);
+  const [role, setRole] = useState<PlayerRole | undefined>(undefined);
 
   return (
     <form

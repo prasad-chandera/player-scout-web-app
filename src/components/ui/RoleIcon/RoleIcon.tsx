@@ -1,15 +1,14 @@
-import type { Role } from "@/lib/types";
+import type { PlayerRole } from "@/lib/types";
 
 /** Single source of truth for how each player role is labelled and coloured. */
-export const ROLE_META: Record<Role, { label: string; accent: string }> = {
+export const ROLE_META: Record<PlayerRole, { label: string; accent: string }> = {
   batter: { label: "Batter", accent: "var(--accent)" },
   bowler: { label: "Bowler", accent: "var(--brand)" },
   allrounder: { label: "All-rounder", accent: "var(--ball)" },
-  wicketkeeper: { label: "Wicket-Keeper", accent: "var(--role-keeper)" },
 };
 
 export interface RoleIconProps {
-  role: Role;
+  role: PlayerRole;
   size?: number;
 }
 
@@ -37,7 +36,7 @@ export function RoleIcon({ role, size = 16 }: RoleIconProps) {
   );
 }
 
-const ROLE_GLYPH: Record<Role, React.ReactNode> = {
+const ROLE_GLYPH: Record<PlayerRole, React.ReactNode> = {
   // cricket bat, angled — blade + handle
   batter: (
     <>
@@ -59,13 +58,6 @@ const ROLE_GLYPH: Record<Role, React.ReactNode> = {
       <path d="M4.5 18.5 12 11" />
       <path d="M11 10l1.8-1.8a1.7 1.7 0 0 1 2.4 2.4L13.4 12z" />
       <circle cx="18" cy="17.5" r="2.6" />
-    </>
-  ),
-  // three stumps + bails
-  wicketkeeper: (
-    <>
-      <path d="M8 8v11M12 8v11M16 8v11" />
-      <path d="M7 8h5M12 8h5" />
     </>
   ),
 };

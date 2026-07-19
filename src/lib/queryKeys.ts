@@ -1,17 +1,14 @@
-// Typed, centralized React Query cache keys. One source of truth so queries and
-// invalidations never drift — e.g. a mutation can invalidate `queryKeys.players()`
-// to refetch every player list. Hierarchical arrays let you invalidate broadly
-// (all players) or narrowly (one player's similar list).
-
-import type { Role } from "@/lib/types";
+// Typed, centralized React Query cache keys — one source of truth so queries and
+// invalidations never drift. Hierarchical arrays allow broad (all of a player's data)
+// or narrow (one endpoint) invalidation.
 
 export const queryKeys = {
-  players: (filters?: { role?: Role; q?: string; minReadiness?: number }) =>
-    filters ? (["players", filters] as const) : (["players"] as const),
-  player: (id: string) => ["players", id] as const,
-  similar: (id: string, opts?: { limit?: number; excludeIpl?: boolean }) =>
-    ["players", id, "similar", opts ?? {}] as const,
-  explanation: (id: string) => ["players", id, "explanation"] as const,
-  search: (query: string, limit?: number) => ["search", query, limit ?? 8] as const,
-  features: () => ["features"] as const,
+  search: (query: string) => ["search", query] as const,
+  playerDetails: (id: string) => ["players", id, "details"] as const,
+  skillRadar: (id: string) => ["players", id, "skill-radar"] as const,
+  economyByPhase: (id: string) => ["players", id, "economy-by-phase"] as const,
+  similar: (name: string, minMatchScore: number) =>
+    ["players", "similar", name, minMatchScore] as const,
+  comparison: (id: string, candidateId: string) =>
+    ["players", id, "similar", candidateId] as const,
 } as const;

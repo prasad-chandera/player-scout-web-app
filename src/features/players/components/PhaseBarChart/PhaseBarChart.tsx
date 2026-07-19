@@ -10,25 +10,24 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import type { PhaseStat, Role } from "@/lib/types";
+import type { PhaseEconomyEntry, PlayerRole } from "@/lib/types";
 
-const PHASE_LABEL: Record<PhaseStat["phase"], string> = {
+const PHASE_LABEL: Record<PhaseEconomyEntry["phase"], string> = {
   powerplay: "Powerplay (1–6)",
   middle: "Middle (7–15)",
   death: "Death (16–20)",
 };
 
 export interface PhaseBarChartProps {
-  role: Role;
-  phaseStats: PhaseStat[];
+  role: PlayerRole;
+  phases: PhaseEconomyEntry[];
 }
 
 /** Phase-wise economy (bowlers) or strike rate (batters); single hue, direct labels. */
-export function PhaseBarChart({ role, phaseStats }: PhaseBarChartProps) {
-  // keepers are batting-first — show strike rate, not economy
-  const isBatter = role === "batter" || role === "wicketkeeper";
+export function PhaseBarChart({ role, phases }: PhaseBarChartProps) {
+  const isBatter = role === "batter";
   const metric = isBatter ? "Strike rate" : "Economy";
-  const data = phaseStats.map((p) => ({
+  const data = phases.map((p) => ({
     phase: PHASE_LABEL[p.phase],
     value: (isBatter ? p.strikeRate : p.economy) ?? 0,
   }));

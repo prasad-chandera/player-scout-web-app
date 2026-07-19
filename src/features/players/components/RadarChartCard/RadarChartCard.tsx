@@ -8,9 +8,9 @@ import {
   ResponsiveContainer,
   Tooltip,
 } from "recharts";
-import type { SkillGroups } from "@/lib/types";
+import type { SkillRadarScores } from "@/lib/types";
 
-const LABELS: Record<keyof SkillGroups, string> = {
+const LABELS: Record<keyof SkillRadarScores, string> = {
   batting: "Batting",
   bowling: "Bowling",
   fielding: "Fielding",
@@ -20,14 +20,15 @@ const LABELS: Record<keyof SkillGroups, string> = {
 
 export interface RadarChartCardProps {
   name: string;
-  skillGroups: SkillGroups;
+  /** 0–10 per axis, from GET /players/{id}/skill-radar. */
+  scores: SkillRadarScores;
 }
 
 /** Single-series skill radar; the card title carries identity (no legend needed). */
-export function RadarChartCard({ name, skillGroups }: RadarChartCardProps) {
-  const data = (Object.keys(LABELS) as (keyof SkillGroups)[]).map((k) => ({
+export function RadarChartCard({ name, scores }: RadarChartCardProps) {
+  const data = (Object.keys(LABELS) as (keyof SkillRadarScores)[]).map((k) => ({
     skill: LABELS[k],
-    value: Math.round(skillGroups[k] * 100),
+    value: Math.round(scores[k] * 10), // 0–10 axis → 0–100 for the chart
   }));
 
   return (

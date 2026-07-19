@@ -1,17 +1,17 @@
 import Link from "next/link";
 import { SimilarityBadge } from "@/components/ui/SimilarityBadge";
 import { RoleIcon, ROLE_META } from "@/components/ui/RoleIcon";
-import type { PlayerSummary } from "@/lib/types";
+import type { CricketPlayer } from "@/lib/types";
 
 export interface PlayerCardProps {
-  player: PlayerSummary;
-  /** 0–1, shown when the card comes from a similarity search */
-  similarity?: number;
+  player: CricketPlayer;
+  /** 0–100 similarity, shown when the card comes from a similar-players list */
+  matchScore?: number;
   /** why this player matched — shown instead of tags when present */
   reason?: string;
 }
 
-export function PlayerCard({ player, similarity, reason }: PlayerCardProps) {
+export function PlayerCard({ player, matchScore, reason }: PlayerCardProps) {
   const role = ROLE_META[player.role];
   return (
     <Link
@@ -48,18 +48,18 @@ export function PlayerCard({ player, similarity, reason }: PlayerCardProps) {
             <RoleIcon role={player.role} size={13} />
             {role.label}
           </span>
-          {/* relevance signal — distinct from the readiness ring (green pill, not a gauge) */}
-          {similarity !== undefined && (
+          {/* relevance signal — distinct from the impact ring (green pill, not a gauge) */}
+          {matchScore !== undefined && (
             <span
               className="ml-auto inline-flex shrink-0 items-center gap-1 rounded-full border px-2 py-0.5 text-[11px] font-semibold tabular-nums text-series"
               style={{
                 background: "color-mix(in srgb, var(--brand) 12%, transparent)",
                 borderColor: "color-mix(in srgb, var(--brand) 30%, transparent)",
               }}
-              title={`${Math.round(similarity * 100)}% similarity match`}
+              title={`${Math.round(matchScore)}% similarity match`}
             >
               <span className="size-1.5 rounded-full bg-series" aria-hidden />
-              {Math.round(similarity * 100)}% match
+              {Math.round(matchScore)}% match
             </span>
           )}
         </div>
@@ -75,13 +75,13 @@ export function PlayerCard({ player, similarity, reason }: PlayerCardProps) {
           </div>
         )}
       </div>
-      {/* right-side stat cluster — price + readiness read as one unit */}
+      {/* right-side stat cluster — price band + impact score read as one unit */}
       <div className="flex shrink-0 items-center gap-4 sm:border-l sm:border-hairline sm:pl-4">
         <div className="hidden text-right sm:block">
-          <p className="text-[11px] uppercase tracking-wide text-ink-muted">Price</p>
-          <p className="font-display text-lg font-bold tabular-nums text-accent">₹{player.expectedPriceLakh}L</p>
+          <p className="text-[11px] uppercase tracking-wide text-ink-muted">Est. price</p>
+          <p className="font-display text-lg font-bold tabular-nums text-accent">{player.estimatedPriceRange.label}</p>
         </div>
-        <SimilarityBadge value={player.readiness} label="ready" size={58} />
+        <SimilarityBadge value={player.impactScore} label="impact" size={58} />
       </div>
     </Link>
   );
