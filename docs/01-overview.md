@@ -2,6 +2,8 @@
 
 > An AI scouting assistant for Indian domestic cricket: search players in plain English, inspect a transparent skill profile, and see who they're similar to — with the reasons shown, not hidden behind a black-box ranker.
 
+**Live app:** https://player-scout-web-app.vercel.app/ (frontend hosted on Vercel).
+
 ---
 
 ## 1. The Problem
