@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { EmptyState } from "@/components/feedback/EmptyState";
+import { ROLE_META } from "@/components/ui/RoleIcon";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { SimilarityBadge } from "@/components/ui/SimilarityBadge";
 import { useTeamFit } from "@/features/team-fit";
@@ -78,7 +79,7 @@ export default function TeamFitPage() {
                   <p className="font-display text-lg font-semibold tracking-wide">
                     {r.player.name}
                     <span className="ml-2 text-[11px] font-normal uppercase tracking-wide text-ink-muted">
-                      {r.player.role} · ready {r.player.readiness} · ₹{r.player.expectedPriceLakh}L
+                      {ROLE_META[r.player.role].label} · ready {r.player.readiness} · ₹{r.player.expectedPriceLakh}L
                     </span>
                   </p>
                   <p className="mt-1 text-sm text-ink-secondary">{r.reason}</p>

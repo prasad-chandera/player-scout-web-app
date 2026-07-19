@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { PlayerCard } from "@/components/ui/PlayerCard";
+import { RoleIcon, ROLE_META } from "@/components/ui/RoleIcon";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { SimilarityBadge } from "@/components/ui/SimilarityBadge";
 import { StatTile } from "@/components/ui/StatTile";
@@ -20,8 +21,7 @@ export default async function PlayerDetailPage({
   const explanation = MOCK_EXPLANATIONS[id] ?? genericExplanation(player);
   const closest = similar[0];
 
-  const roleLabel =
-    player.role === "allrounder" ? "All-rounder" : player.role[0].toUpperCase() + player.role.slice(1);
+  const role = ROLE_META[player.role];
 
   return (
     <div className="space-y-8">
@@ -29,14 +29,17 @@ export default async function PlayerDetailPage({
         <div className="flex flex-wrap items-center gap-5">
           <div
             className="flex size-20 items-center justify-center rounded-2xl font-display text-3xl font-bold ring-2"
-            style={{ background: "var(--surface)", color: "var(--brand)" }}
+            style={{ background: "var(--surface)", color: role.accent }}
           >
             {player.name.split(" ").map((w) => w[0]).slice(0, 2).join("")}
           </div>
           <div className="min-w-0 flex-1">
             <h1 className="font-display text-3xl font-bold uppercase tracking-wide sm:text-4xl">{player.name}</h1>
-            <p className="mt-1 text-sm text-ink-secondary">
-              {roleLabel}
+            <p className="mt-1 flex flex-wrap items-center gap-x-1.5 gap-y-1 text-sm text-ink-secondary">
+              <span className="inline-flex items-center gap-1 font-medium" style={{ color: role.accent }}>
+                <RoleIcon role={player.role} size={15} />
+                {role.label}
+              </span>
               {player.bowlingStyle ? ` · ${player.bowlingStyle}` : ""} · {player.battingHand}-hand bat · age {player.age} ·{" "}
               {player.competition.toUpperCase()}, {player.matches} matches
             </p>

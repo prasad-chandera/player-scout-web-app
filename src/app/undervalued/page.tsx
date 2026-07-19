@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ROLE_META } from "@/components/ui/RoleIcon";
 import { ValueScatter } from "@/features/undervalued";
 import { MOCK_PLAYERS, UNDERVALUED_DISCLAIMER } from "@/lib/mock/players";
 import { toSummary } from "@/lib/query";
@@ -72,7 +73,7 @@ export default function UndervaluedPage() {
                   <Link href={`/players/${e.player.id}`} className="font-display font-semibold tracking-wide hover:text-series">
                     {e.player.name}
                   </Link>
-                  <span className="ml-2 text-[11px] uppercase tracking-wide text-ink-muted">{e.player.role}</span>
+                  <span className="ml-2 text-[11px] uppercase tracking-wide text-ink-muted">{ROLE_META[e.player.role].label}</span>
                 </td>
                 <td className="px-4 py-3 text-right font-display font-semibold tabular-nums">{e.player.readiness}</td>
                 <td className="px-4 py-3 text-right tabular-nums text-ink-secondary">{formatLakh(e.expectedPriceLakh)}</td>

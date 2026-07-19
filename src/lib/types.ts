@@ -1,7 +1,7 @@
 // Shared contract with the backend — mirrors docs/03-api-endpoints-and-ai.md exactly.
 // If a shape changes there, change it here.
 
-export type Role = "batter" | "bowler" | "allrounder";
+export type Role = "batter" | "bowler" | "allrounder" | "wicketkeeper";
 export type Competition = "smat" | "ipl";
 export type Phase = "powerplay" | "middle" | "death";
 

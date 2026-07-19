@@ -25,7 +25,8 @@ export interface PhaseBarChartProps {
 
 /** Phase-wise economy (bowlers) or strike rate (batters); single hue, direct labels. */
 export function PhaseBarChart({ role, phaseStats }: PhaseBarChartProps) {
-  const isBatter = role === "batter";
+  // keepers are batting-first — show strike rate, not economy
+  const isBatter = role === "batter" || role === "wicketkeeper";
   const metric = isBatter ? "Strike rate" : "Economy";
   const data = phaseStats.map((p) => ({
     phase: PHASE_LABEL[p.phase],

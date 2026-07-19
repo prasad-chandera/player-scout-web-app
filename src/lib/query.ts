@@ -94,8 +94,9 @@ export function fallbackParse(text: string): SearchIntent {
     }
   }
 
-  // role
-  if (/all[\s-]?rounder/.test(t)) intent.role = "allrounder";
+  // role — check keeper first: keeper phrasings ("wicketkeeper-batsman") contain "bat"
+  if (/wicket[\s-]?keeper|keeper|stumper|\bwk\b/.test(t)) intent.role = "wicketkeeper";
+  else if (/all[\s-]?rounder/.test(t)) intent.role = "allrounder";
   else if (/bowl(er|ing)?|pacer|spinner|seamer/.test(t)) intent.role = "bowler";
   else if (/bat(ter|sman|ting)?/.test(t)) intent.role = "batter";
 
@@ -154,7 +155,14 @@ export function describeIntent(intent: SearchIntent): string {
   }
   const parts: string[] = [];
   if (intent.bowlingStyleContains) parts.push(`${intent.bowlingStyleContains} bowlers`);
-  else if (intent.role) parts.push(intent.role === "allrounder" ? "all-rounders" : `${intent.role}s`);
+  else if (intent.role)
+    parts.push(
+      intent.role === "allrounder"
+        ? "all-rounders"
+        : intent.role === "wicketkeeper"
+          ? "wicket-keepers"
+          : `${intent.role}s`,
+    );
   else parts.push("players");
   if (intent.battingHand) parts.push(`${intent.battingHand}-hand bat`);
   if (intent.strongVs) parts.push(`strong vs ${intent.strongVs}`);

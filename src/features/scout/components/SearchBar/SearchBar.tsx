@@ -8,6 +8,7 @@ const ROLES: { value: Role | undefined; label: string }[] = [
   { value: "batter", label: "Batters" },
   { value: "bowler", label: "Bowlers" },
   { value: "allrounder", label: "All-rounders" },
+  { value: "wicketkeeper", label: "Keepers" },
 ];
 
 export interface SearchBarProps {

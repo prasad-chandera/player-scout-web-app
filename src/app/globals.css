@@ -18,6 +18,7 @@
   --accent: #b7841f;         /* auction gold */
   --accent-contrast: #1a1200;
   --ball: #c2362f;           /* seam red — value-gap, alerts, motifs */
+  --role-keeper: #3b6fb0;    /* slate-blue — wicket-keeper role marker */
 }
 
 /* ---- Tier 2: semantic tokens — LIGHT (default), parchment + pitch ---- */
@@ -56,6 +57,7 @@
     --brand-strong: #1f9a54;
     --accent: #e7b23c;
     --ball: #e24b41;
+    --role-keeper: #5b8fd6;
     --background: #0b1710;
     --surface: #10201a;
     --surface-raised: #16281f;
@@ -79,6 +81,7 @@
   --brand-strong: #1f9a54;
   --accent: #e7b23c;
   --ball: #e24b41;
+  --role-keeper: #5b8fd6;
   --background: #0b1710;
   --surface: #10201a;
   --surface-raised: #16281f;
@@ -115,6 +118,7 @@
   --color-accent: var(--accent);
   --color-accent-contrast: var(--accent-contrast);
   --color-ball: var(--ball);
+  --color-role-keeper: var(--role-keeper);
   --color-on-primary: var(--brand-contrast);
   --color-brand-strong: var(--brand-strong);
   --color-good: var(--good);
