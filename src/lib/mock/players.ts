@@ -2,12 +2,7 @@
 // renders before the backend exists. Stats are plausible but FICTIONAL —
 // including those attached to real-name reference players.
 
-import type {
-  Explanation,
-  FeatureMeta,
-  Player,
-  TeamProfile,
-} from "@/lib/types";
+import type { Explanation, FeatureMeta, Player } from "@/lib/types";
 
 // Frozen vector ordering (mirror of GET /api/meta/features, version 1).
 // Bowler and batter vectors share one 10-slot layout in the mock for simplicity.
@@ -392,74 +387,6 @@ export function genericExplanation(p: Player): Explanation {
     comparablePlayers: [],
   };
 }
-
-export const MOCK_TEAMS: TeamProfile[] = [
-  {
-    id: "mi", name: "Mumbai Indians", short: "MI",
-    colors: { primary: "#045093", secondary: "#B8860B" },
-    needs: [
-      { role: "death-bowler", weight: 0.4, label: "Death-overs bowler" },
-      { role: "finisher", weight: 0.35, label: "Death-overs finisher" },
-      { role: "spin-allrounder", weight: 0.25, label: "Spin-bowling all-rounder" },
-    ],
-    budgetLakh: 650, prefersIndian: true,
-  },
-  {
-    id: "csk", name: "Chennai Super Kings", short: "CSK",
-    colors: { primary: "#F9CD05", secondary: "#2B2A29" },
-    needs: [
-      { role: "powerplay-bowler", weight: 0.4, label: "New-ball bowler" },
-      { role: "middle-order-spin-hitter", weight: 0.35, label: "Middle-order batter vs spin" },
-      { role: "fielding", weight: 0.25, label: "Athletic fielders" },
-    ],
-    budgetLakh: 550, prefersIndian: true,
-  },
-  {
-    id: "rcb", name: "Royal Challengers Bengaluru", short: "RCB",
-    colors: { primary: "#DA1818", secondary: "#2B2A29" },
-    needs: [
-      { role: "death-bowler", weight: 0.5, label: "Death-overs bowler" },
-      { role: "middle-order-spin-hitter", weight: 0.3, label: "Middle-order spin hitter" },
-      { role: "spin-allrounder", weight: 0.2, label: "Spin-bowling all-rounder" },
-    ],
-    budgetLakh: 800, prefersIndian: true,
-  },
-  {
-    id: "gt", name: "Gujarat Titans", short: "GT",
-    colors: { primary: "#1C2C4B", secondary: "#C9A23F" },
-    needs: [
-      { role: "finisher", weight: 0.45, label: "Death-overs finisher" },
-      { role: "powerplay-bowler", weight: 0.3, label: "New-ball bowler" },
-      { role: "wicket-taking-spinner", weight: 0.25, label: "Middle-overs wicket-taker" },
-    ],
-    budgetLakh: 700, prefersIndian: false,
-  },
-  {
-    id: "kkr", name: "Kolkata Knight Riders", short: "KKR",
-    colors: { primary: "#3A225D", secondary: "#F2C12E" },
-    needs: [
-      { role: "powerplay-batter", weight: 0.4, label: "Powerplay opener" },
-      { role: "death-bowler", weight: 0.35, label: "Death-overs bowler" },
-      { role: "wicket-taking-spinner", weight: 0.25, label: "Wrist spinner" },
-    ],
-    budgetLakh: 600, prefersIndian: true,
-  },
-];
-
-// Which feature slots define each need role (indexes into FEATURES ordering).
-export const NEED_FEATURES: Record<string, { indexes: number[]; roles: Array<Player["role"]> }> = {
-  "death-bowler": { indexes: [1, 2, 7], roles: ["bowler", "allrounder"] },
-  "powerplay-bowler": { indexes: [0, 3], roles: ["bowler", "allrounder"] },
-  "wicket-taking-spinner": { indexes: [3, 5], roles: ["bowler"] },
-  finisher: { indexes: [1, 7], roles: ["batter", "allrounder", "wicketkeeper"] },
-  "powerplay-batter": { indexes: [0, 9], roles: ["batter", "wicketkeeper"] },
-  "middle-order-spin-hitter": { indexes: [4, 6], roles: ["batter", "allrounder", "wicketkeeper"] },
-  "spin-allrounder": { indexes: [4, 6, 8], roles: ["allrounder"] },
-  fielding: { indexes: [8], roles: ["batter", "bowler", "allrounder", "wicketkeeper"] },
-};
-
-export const UNDERVALUED_DISCLAIMER =
-  "Expected value = what equivalent skills have historically cost at auction; not a market prediction.";
 
 // Search aliases for the mock "find the next X" resolver.
 export const SEARCH_ALIASES: Record<string, string> = {

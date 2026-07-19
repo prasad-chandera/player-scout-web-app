@@ -5,15 +5,13 @@ import { usePathname } from "next/navigation";
 import { Logo } from "@/components/ui/Logo";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
 
-const NAV = [
-  { href: "/", label: "Discover" },
-  { href: "/undervalued", label: "Hidden Gems" },
-  { href: "/team-fit", label: "Team Fit" },
-];
+const NAV = [{ href: "/", label: "Discover" }];
 
 /** Sticky app header — brand mark, primary nav with active state, and the theme toggle. */
 export function Header() {
   const pathname = usePathname();
+  // Landing page shows no nav items; other pages (player details) surface a way back.
+  const nav = pathname === "/" ? [] : NAV;
 
   return (
     <header className="sticky top-0 z-20 border-b border-hairline bg-background/70 backdrop-blur-xl">
@@ -26,7 +24,7 @@ export function Header() {
         </Link>
 
         <nav className="ml-auto flex items-center gap-1.5">
-          {NAV.map((n) => {
+          {nav.map((n) => {
             const active = pathname === n.href;
             return (
               <Link
@@ -44,8 +42,12 @@ export function Header() {
             );
           })}
         </nav>
-
-        <span className="mx-1 h-6 w-px bg-hairline" aria-hidden />
+        {
+          pathname === "/"
+          ? null
+          : <span className="mx-1 h-6 w-px bg-hairline" aria-hidden />
+        }
+        
         <ThemeToggle />
 
         {/* broadcast lower-third accent along the header's bottom edge */}

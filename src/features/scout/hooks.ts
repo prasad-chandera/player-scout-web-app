@@ -1,65 +1,49 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
-import { MOCK_PLAYERS } from "@/lib/mock/players";
-import { executeIntent, fallbackParse, toSummary } from "@/lib/query";
-import type { PlayerSummary, Role, SmartSearchResponse } from "@/lib/types";
-
-// ─── Mock data reads ───
-// The app runs entirely on bundled mock data, so these are synchronous reads.
-
-function listPlayers(opts?: { role?: Role; q?: string; minReadiness?: number }): PlayerSummary[] {
-  return MOCK_PLAYERS.filter(
-    (p) =>
-      (!opts?.role || p.role === opts.role) &&
-      (!opts?.q || p.name.toLowerCase().includes(opts.q.toLowerCase())) &&
-      (!opts?.minReadiness || p.readiness >= opts.minReadiness),
-  )
-    .sort((a, b) => b.readiness - a.readiness)
-    .map(toSummary);
-}
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
+import { useCallback, useState } from "react";
+import { listPlayers, smartSearch } from "@/lib/api";
+import { queryKeys } from "@/lib/queryKeys";
+import type { Role } from "@/lib/types";
 
 /**
- * Smart natural-language search. Mirrors the backend's Gemini→SearchIntent→engine
- * pipeline deterministically: a keyword parser feeds the local ranking engine.
- */
-function smartSearch(query: string, limit = 8): SmartSearchResponse {
-  return executeIntent(fallbackParse(query), limit);
-}
-
-// ─── Hook ───
-
-/**
- * Drives the scout home page: readiness rankings on mount, plus a search that
- * either runs a natural-language query or (on an empty query) re-filters the
- * rankings by role. Encapsulates the loading/error state so the page stays thin.
+ * Drives the scout home page. Two React Query reads through @/lib/api:
+ *   • readiness rankings (optionally re-filtered by role), and
+ *   • a natural-language search that runs only once a query is submitted.
+ * React Query owns the caching/loading/error state, so the page stays thin and
+ * the same hook works against mock or the real backend unchanged.
  */
 export function useScout() {
-  const [rankings, setRankings] = useState<PlayerSummary[]>([]);
-  const [search, setSearch] = useState<SmartSearchResponse | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [busy, setBusy] = useState(false);
+  const [role, setRole] = useState<Role | undefined>(undefined);
+  const [query, setQuery] = useState("");
 
-  useEffect(() => {
-    setRankings(listPlayers());
+  const rankingsQuery = useQuery({
+    queryKey: queryKeys.players({ role }),
+    queryFn: () => listPlayers({ role }),
+  });
+
+  const searchQuery = useQuery({
+    queryKey: queryKeys.search(query),
+    queryFn: () => smartSearch(query),
+    enabled: query.length > 0,
+    placeholderData: keepPreviousData,
+  });
+
+  // Empty query → clear the search and (re)filter rankings by role.
+  const runSearch = useCallback((q: string, r?: Role) => {
+    setRole(r);
+    setQuery(q);
   }, []);
 
-  const runSearch = useCallback((query: string, role?: Role) => {
-    setError(null);
-    setBusy(true);
-    if (!query) {
-      setSearch(null);
-      setRankings(listPlayers({ role }));
-      setBusy(false);
-      return;
-    }
-    const res = smartSearch(query);
-    setSearch(res);
-    if (res.results.length === 0) {
-      setError('No players matched that query. Try e.g. "left-arm death bowler under ₹50 lakh".');
-    }
-    setBusy(false);
-  }, []);
+  const searching = query.length > 0;
+  const search = searching ? (searchQuery.data ?? null) : null;
+  const busy = searching ? searchQuery.isFetching : rankingsQuery.isFetching;
+  const error =
+    searchQuery.error?.message ??
+    rankingsQuery.error?.message ??
+    (search && search.results.length === 0
+      ? 'No players matched that query. Try e.g. "left-arm death bowler under ₹50 lakh".'
+      : null);
 
-  return { rankings, search, error, busy, runSearch };
+  return { rankings: rankingsQuery.data ?? [], search, error, busy, runSearch };
 }

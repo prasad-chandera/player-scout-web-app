@@ -5,8 +5,7 @@ import { SectionHeading } from "@/components/ui/SectionHeading";
 import { SimilarityBadge } from "@/components/ui/SimilarityBadge";
 import { StatTile } from "@/components/ui/StatTile";
 import { AISummaryCard, ComparisonTable, PhaseBarChart, RadarChartCard } from "@/features/players";
-import { MOCK_EXPLANATIONS, MOCK_PLAYERS, genericExplanation } from "@/lib/mock/players";
-import { similarTo } from "@/lib/query";
+import { getExplanation, getPlayer, getSimilar } from "@/lib/api";
 
 export default async function PlayerDetailPage({
   params,
@@ -14,11 +13,13 @@ export default async function PlayerDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const player = MOCK_PLAYERS.find((p) => p.id === id);
+  const player = await getPlayer(id).catch(() => null);
   if (!player) notFound();
 
-  const similar = similarTo(player, 4, false);
-  const explanation = MOCK_EXPLANATIONS[id] ?? genericExplanation(player);
+  const [{ results: similar }, explanation] = await Promise.all([
+    getSimilar(id, { limit: 4, excludeIpl: false }),
+    getExplanation(id),
+  ]);
   const closest = similar[0];
 
   const role = ROLE_META[player.role];

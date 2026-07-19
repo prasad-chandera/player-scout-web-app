@@ -2,12 +2,9 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono, Oswald } from "next/font/google";
 import { Footer } from "@/components/layouts/Footer";
 import { Header } from "@/components/layouts/Header";
+import { QueryProvider } from "@/components/providers";
+import { THEME_INIT_SCRIPT } from "@/lib/theme";
 import "./globals.css";
-
-// Applied before first paint to prevent a flash of the wrong theme.
-// Stored choice wins; otherwise the OS setting (via CSS) decides, so we leave
-// data-theme unset in that case.
-const THEME_INIT = `(function(){try{var t=localStorage.getItem("scoutiq-theme");if(t==="light"||t==="dark"){document.documentElement.dataset.theme=t;}}catch(e){}})();`;
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -44,12 +41,14 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} ${oswald.variable} h-full antialiased`}
     >
       <head>
-        <script dangerouslySetInnerHTML={{ __html: THEME_INIT }} />
+        <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
       </head>
       <body className="grain relative flex min-h-full flex-col">
-        <Header />
-        <main className="relative z-[1] mx-auto w-full max-w-6xl flex-1 px-4 py-10">{children}</main>
-        <Footer />
+        <QueryProvider>
+          <Header />
+          <main className="relative z-[1] mx-auto w-full max-w-6xl flex-1 px-4 py-10">{children}</main>
+          <Footer />
+        </QueryProvider>
       </body>
     </html>
   );

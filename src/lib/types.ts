@@ -105,68 +105,11 @@ export interface SmartSearchResponse {
   results: SmartSearchResult[];
 }
 
-export interface ReadinessBreakdownRow {
-  feature: string;
-  label: string;
-  weight: number;
-  normalizedValue: number;
-  contribution: number; // 100 × weight × normalizedValue
-}
-
-export interface ReadinessResponse {
-  playerId: string;
-  score: number;
-  breakdown: ReadinessBreakdownRow[];
-  modelVersion: string;
-}
-
 export interface Explanation {
   summary: string;
   strengths: string[];
   weaknesses: string[];
   comparablePlayers: { name: string; note: string }[];
-}
-
-export interface UndervaluedEntry {
-  rank: number;
-  player: PlayerSummary;
-  expectedPriceLakh: number;
-  expectedValueLakh: number;
-  valueGapLakh: number;
-  reasons: string[];
-}
-
-export interface UndervaluedResponse {
-  players: UndervaluedEntry[];
-  disclaimer: string;
-}
-
-export interface TeamNeed {
-  role: string;
-  weight: number;
-  label: string;
-}
-
-export interface TeamProfile {
-  id: string;
-  name: string;
-  short: string;
-  colors: { primary: string; secondary: string };
-  needs: TeamNeed[];
-  budgetLakh: number;
-  prefersIndian: boolean;
-}
-
-export interface TeamFitRecommendation {
-  player: PlayerSummary;
-  fitScore: number;
-  matchedNeed: string;
-  reason: string;
-}
-
-export interface TeamFitResponse {
-  team: { id: string; name: string };
-  recommendations: TeamFitRecommendation[];
 }
 
 /** GET /api/meta/features — frozen vector ordering shared with the backend */
