@@ -33,7 +33,7 @@ export function SearchBar({ onSearch, busy }: SearchBarProps) {
           <input
             value={text}
             onChange={(e) => setText(e.target.value)}
-            placeholder='Try "a left-arm death bowler under ₹50 lakh"…'
+            placeholder='Try "a bowler at below ₹50 lakh"…'
             className="w-full rounded-2xl border border-hairline bg-surface-raised py-4 pl-11 pr-4 text-foreground shadow-[var(--shadow-1)] transition-shadow placeholder:text-ink-muted focus:outline-none focus:[box-shadow:var(--glow-brand)]"
             aria-label="Player search"
           />

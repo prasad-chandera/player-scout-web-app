@@ -55,7 +55,7 @@ export default function ScoutPage() {
         !busy &&
         !hasSearched && (
           <section className="space-y-3 py-8 text-center">
-            <SectionHeading sub="e.g. “a left-arm death bowler under ₹50 lakh” or “aggressive top-order batter”.">
+            <SectionHeading sub="e.g. “a bowler at below ₹50 lakh” or “aggressive top-order batter”.">
               Search to discover players
             </SectionHeading>
           </section>
