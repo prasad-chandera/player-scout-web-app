@@ -1,7 +1,8 @@
 // The single data-access layer. Every page/hook talks to the backend ONLY through
 // these typed async functions — see docs/03-api-endpoints-and-ai.md for the contract.
 //
-// Base URL is env-driven (NEXT_PUBLIC_API_URL, no /api prefix). Every response is the
+// Base URL is env-driven (NEXT_PUBLIC_API_URL — the full API base, may include an /api
+// segment; the client appends /players/... to it). Every response is the
 // wrapped ApiResponse envelope { status, error, message, data }; `request` unwraps it,
 // throwing ApiError on FAILED / non-2xx and otherwise returning `data` (which may be
 // null for the nullable endpoints).

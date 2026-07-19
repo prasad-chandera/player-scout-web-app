@@ -36,8 +36,9 @@ data), so it needs a running backend to show players — see below.
 ## Connecting the backend
 
 1. Build/run the Node.js backend against [docs/03-api-endpoints-and-ai.md](docs/03-api-endpoints-and-ai.md).
-2. `cp .env.local.example .env.local` and set `NEXT_PUBLIC_API_URL` to the backend root
-   (e.g. `http://localhost:4000` — no `/api` prefix).
+2. `cp .env.local.example .env.local` and set `NEXT_PUBLIC_API_URL` to the **full API base**
+   (e.g. `https://api.pssc.livetronics.ai/api`). The client appends `/players/...` to it, so
+   a search resolves to `https://api.pssc.livetronics.ai/api/players/search`.
 
 Key source files: [src/lib/types/](src/lib/types/) (shared API shapes),
 [src/lib/api.ts](src/lib/api.ts) (typed fetch client + response-envelope handling).

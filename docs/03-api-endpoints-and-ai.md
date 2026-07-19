@@ -6,9 +6,14 @@ separate Node.js analytics backend. The frontend is typed against the shapes in
 
 ## Conventions
 
-- **Base URL:** the frontend reads `NEXT_PUBLIC_API_URL` and appends the paths below
-  (e.g. `${NEXT_PUBLIC_API_URL}/players/search`). There is **no `/api` prefix** — set
-  the env var to the backend root (e.g. `http://localhost:4000`).
+- **Base URL:** the frontend reads `NEXT_PUBLIC_API_URL` (the **full API base**, e.g.
+  `https://api.pssc.livetronics.ai/api`) and appends the paths below — so a search hits
+  `${NEXT_PUBLIC_API_URL}/players/search`. The base includes whatever path prefix the
+  deployment uses (here `/api`); the client does not add one.
+- **Source headers:** the deployed API also requires source-identification headers on
+  every request. Calls without them are rejected with
+  `403 FORBIDDEN {"error":"FORBIDDEN","message":"Source headers missing."}`. Wiring these
+  into the client (`src/lib/api.ts`) is still to be finalized.
 - **Response envelope:** every response is wrapped:
 
   ```ts

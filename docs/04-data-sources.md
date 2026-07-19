@@ -131,7 +131,8 @@ Step 6  Emit                 in-memory catalogue + persistence            (~1 h)
 ## 7. No frontend mock data
 
 The frontend no longer ships bundled mock data — it calls the backend directly through
-`src/lib/api.ts`. Point `NEXT_PUBLIC_API_URL` at a running backend to see players.
+`src/lib/api.ts`. Point `NEXT_PUBLIC_API_URL` at the API base (e.g.
+`https://api.pssc.livetronics.ai/api`) to see players.
 
 ## 8. Licensing & attribution checklist
 

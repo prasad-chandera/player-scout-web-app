@@ -61,12 +61,12 @@ export function PlayerProfile({ id }: { id: string }) {
               </div>
             )}
           </div>
-          <SimilarityBadge value={player.readinessScore} label="IPL ready" size={92} />
+          <SimilarityBadge value={player.readinessScore} label="Impact" size={92} />
         </div>
         <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
           <StatTile label="Est. price" value={player.estimatedPriceRange.label} tone="gold" />
           <StatTile label="Matches" value={String(player.matches)} />
-          <StatTile label="Readiness" value={String(player.readinessScore)} tone="green" />
+          <StatTile label="Impact" value={String(Math.round(player.readinessScore))} tone="green" />
           <StatTile label={player.currentIPLTeam ? "Current IPL team" : "Competition"} value={player.currentIPLTeam ?? player.competition.toUpperCase()} />
         </div>
       </section>
